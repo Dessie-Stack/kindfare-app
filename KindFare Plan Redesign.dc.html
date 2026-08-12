@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<script src="./kindfare-sound.js"></script>
+<style>
+  body{margin:0}
+  [style*="overflow-y:auto"]::-webkit-scrollbar{display:none}
+  [style*="overflow-y:auto"]{scrollbar-width:none}
+
+  a{color:#4A6B8A}
+  a:hover{color:#3a5670}
+  @keyframes kf-drift1{0%{transform:translate(0,0) scale(1)} 33%{transform:translate(55px,70px) scale(1.25)} 66%{transform:translate(-30px,40px) scale(0.88)} 100%{transform:translate(0,0) scale(1)}}
+  @keyframes kf-drift2{0%{transform:translate(0,0) scale(1)} 33%{transform:translate(-65px,45px) scale(1.2)} 66%{transform:translate(35px,-25px) scale(0.85)} 100%{transform:translate(0,0) scale(1)}}
+  @keyframes kf-drift3{0%{transform:translate(0,0) scale(1)} 33%{transform:translate(45px,-60px) scale(1.28)} 66%{transform:translate(-40px,25px) scale(0.82)} 100%{transform:translate(0,0) scale(1)}}
+  @media (prefers-reduced-motion: reduce){ [style*="kf-drift"]{animation:none !important} }
+</style>
+</helmet>
+
+<div style="width:390px;height:844px;position:relative;background:{{ outerBg }};overflow:hidden;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:{{ textPrimary }};box-shadow:0 30px 70px rgba(0,0,0,.25)">
+
+  <div style="position:absolute;inset:0;z-index:0;overflow:hidden">
+    <div style="position:absolute;width:260px;height:260px;top:-60px;left:-70px;border-radius:50%;filter:blur(50px);opacity:.85;background:radial-gradient(circle,#e8ecf0 0%,#BDC9D6 70%,transparent 100%);animation:kf-drift1 11s ease-in-out infinite"></div>
+    <div style="position:absolute;width:300px;height:300px;top:160px;right:-110px;border-radius:50%;filter:blur(50px);opacity:.85;background:radial-gradient(circle,#dde6d5 0%,#7fa06b 70%,transparent 100%);animation:kf-drift2 13s ease-in-out infinite"></div>
+    <div style="position:absolute;width:280px;height:280px;bottom:180px;left:-90px;border-radius:50%;filter:blur(50px);opacity:.85;background:radial-gradient(circle,#f0c674 0%,#d98816 70%,transparent 100%);animation:kf-drift3 10s ease-in-out infinite"></div>
+    <div style="position:absolute;width:220px;height:220px;bottom:-80px;right:-40px;border-radius:50%;filter:blur(50px);opacity:.85;background:radial-gradient(circle,#d7dde3 0%,#BDC9D6 70%,transparent 100%);animation:kf-drift1 9s ease-in-out infinite reverse"></div>
+  </div>
+
+  <div style="position:relative;z-index:1;height:47px;padding:0 26px;display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:8px;font-size:15px;font-weight:600;color:{{ textPrimary }}">
+    <span>9:41</span>
+    <span style="display:flex;gap:5px;align-items:center">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/><rect x="5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/><rect x="10" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="1" fill="currentColor" opacity=".4"/></svg>
+      <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="1" y="1" width="21" height="11" rx="3" stroke="currentColor" stroke-width="1"/><rect x="2.5" y="2.5" width="15" height="8" rx="1.5" fill="currentColor"/><rect x="23.5" y="4" width="1.6" height="5" rx="0.8" fill="currentColor"/></svg>
+    </span>
+  </div>
+
+  <div style="position:absolute;z-index:1;inset:47px 0 84px 0;overflow-y:auto;box-sizing:border-box;padding-bottom:24px">
+
+    <!-- header -->
+    <div style="padding:6px 20px 12px;position:relative">
+      <button aria-label="Toggle dark mode" onClick="{{ toggleDark }}" style="position:absolute;top:6px;right:20px;width:32px;height:32px;border-radius:50%;background:{{ glassBg }};border:1px solid {{ hairline }};display:flex;align-items:center;justify-content:center;cursor:pointer;color:{{ textPrimary }}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+      </button>
+      <div style="font-size:13px;color:{{ textSecondary }};font-weight:600">Plan</div>
+      <h1 style="font-size:26px;font-weight:700;letter-spacing:-.5px;margin-top:2px;font-family:ui-serif,Georgia,serif">{{ headerTitle }}</h1>
+    </div>
+
+    <!-- segmented control — native iOS pattern: neutral track, floating white pill with depth on the active segment (not a flat fill) -->
+    <div style="display:flex;gap:2px;margin:0 20px 16px;padding:3px;border-radius:14px;background:{{ hairlineSoft }}">
+      <button onClick="{{ setToday }}" style="flex:1;height:40px;border-radius:12px;background:{{ todayBg }};color:{{ todayColor }};border:none;font-size:13.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:{{ todayShadow }}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.5" fill="#4A6B8A"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="#4A6B8A" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Today
+      </button>
+      <button onClick="{{ setWeek }}" style="flex:1;height:40px;border-radius:12px;background:{{ weekBg }};color:{{ weekColor }};border:none;font-size:13.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:{{ weekShadow }}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Week
+      </button>
+      <button onClick="{{ setCalendar }}" style="flex:1;height:40px;border-radius:12px;background:{{ calBg }};color:{{ calColor }};border:none;font-size:13.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:{{ calShadow }}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="8.5" cy="15" r="1.3" fill="currentColor"/><circle cx="15.5" cy="15" r="1.3" fill="currentColor"/></svg>
+        Calendar
+      </button>
+    </div>
+
+    <sc-if value="{{ isToday }}" hint-placeholder-val="{{ true }}">
+    <div style="padding:0 20px 4px;font-size:14px;line-height:1.5;color:{{ textSecondary }};font-weight:500">Tap items as you eat them — your calorie ring updates live.</div>
+
+    <!-- HERO: eaten today -->
+    <div style="position:sticky;top:0;z-index:5;margin:10px 20px 0;padding:18px 20px;border-radius:24px;background:linear-gradient(160deg,rgba(255,255,255,.92),{{ glassBgStrong }});backdrop-filter:blur(24px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 18px 36px rgba(30,28,24,.12),0 1px 0 {{ glassBgLight }} inset">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12.5px;font-weight:700;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.4px">Eaten today</div>
+          <div style="font-size:12.5px;color:{{ textSecondary }};font-weight:600;margin-top:2px">{{ eatenProtein }}g protein · {{ eatenCarbs }}g carbs · {{ eatenFat }}g fat</div>
+        </div>
+        <div style="font-size:26px;font-weight:800;font-family:ui-rounded,'SF Pro Rounded',sans-serif;color:#4A6B8A;white-space:nowrap;flex-shrink:0;margin-left:12px">{{ eatenKcal }}<span style="font-size:14px;color:{{ textSecondary }};font-weight:600"> / 1,800</span></div>
+      </div>
+      <div style="height:8px;border-radius:999px;background:rgba(150,150,158,.16);margin-top:12px;overflow:hidden">
+        <div style="width:{{ eatenPct }}%;height:100%;border-radius:999px;background:linear-gradient(90deg,#4A6B8A,#4F7A63)"></div>
+      </div>
+    </div>
+
+    <!-- scan-added toast -->
+    <sc-if value="{{ scanToast }}" hint-placeholder-val="{{ false }}">
+      <div style="position:sticky;top:8px;z-index:6;margin:8px 20px 0;padding:11px 16px;border-radius:14px;background:rgba(79,122,99,.94);color:#fff;font-size:13px;font-weight:600;text-align:center;box-shadow:0 10px 22px rgba(0,0,0,.22)">{{ scanToast }}</div>
+    </sc-if>
+
+    <!-- Today's movement -->
+    <div style="margin:14px 20px 0;padding:18px;border-radius:22px;background:linear-gradient(160deg,{{ glassBgStrong }},{{ glassBgLight }});backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 14px 30px rgba(30,28,24,.1),0 1px 0 {{ glassBgLight }} inset">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:12px">
+        <span style="width:26px;height:26px;border-radius:9px;background:rgba(79,122,99,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 12h4l2-7 4 14 2-7h4" stroke="#4F7A63" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span style="font-size:13px;font-weight:700">Today's movement</span>
+      </div>
+      <div style="font-size:14px;line-height:1.5;color:{{ textSecondary }};font-weight:500">Connect Apple Health on your Profile to see today's steps here.</div>
+      <div style="font-size:12.5px;font-weight:700;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.3px;margin-top:16px">Two gentle wins</div>
+      <div style="display:flex;flex-direction:column;gap:9px;margin-top:10px">
+        <button onClick="{{ toggleStretch }}" style="height:50px;border-radius:14px;background:{{ stretchDoneBg }};border:1px solid {{ hairline }};display:flex;align-items:center;gap:10px;padding:0 14px;font-size:14px;font-weight:600;color:#1E1C18;cursor:pointer">
+          <span style="width:28px;height:28px;border-radius:9px;background:rgba(79,122,99,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="display:{{ stretchIconDisplay }}"><circle cx="12" cy="12" r="9" stroke="#4F7A63" stroke-width="1.6"/><path d="M12 7v5l3.5 2" stroke="#4F7A63" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="display:{{ stretchCheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#4F7A63" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span style="flex:1;text-align:left">10-min gentle stretch</span>
+          <span style="font-size:12px;font-weight:700;color:#4F7A63">{{ stretchLabel }}</span>
+        </button>
+        <button onClick="{{ toggleWalk }}" style="height:50px;border-radius:14px;background:{{ walkDoneBg }};border:1px solid {{ hairline }};display:flex;align-items:center;gap:10px;padding:0 14px;font-size:14px;font-weight:600;color:#1E1C18;cursor:pointer">
+          <span style="width:28px;height:28px;border-radius:9px;background:rgba(79,122,99,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="display:{{ walkIconDisplay }}"><path d="M4 12h4l2-7 4 14 2-7h4" stroke="#4F7A63" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="display:{{ walkCheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#4F7A63" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span style="flex:1;text-align:left">Short walk</span>
+          <span style="font-size:12px;font-weight:700;color:#4F7A63">{{ walkLabel }}</span>
+        </button>
+      </div>
+      <div style="font-size:12.5px;color:{{ textSecondary }};line-height:1.5;font-weight:500;margin-top:12px">A gentle suggestion, not a target — informed by NHS and NICE guidance on movement for joint health. Check with your GP before starting new movement if you're recovering from an injury.</div>
+    </div>
+
+    <!-- Boost suggestion -->
+    <div style="margin:14px 20px 0;padding:18px;border-radius:22px;background:linear-gradient(160deg,{{ glassBgStrong }},{{ glassBgLight }});backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 14px 30px rgba(30,28,24,.1),0 1px 0 {{ glassBgLight }} inset">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px">
+        <span style="width:26px;height:26px;border-radius:9px;background:rgba(79,122,99,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z" fill="#4F7A63"/></svg>
+        </span>
+        <span style="font-size:13px;font-weight:700">Boost suggestion</span>
+      </div>
+      <div style="font-size:14px;font-weight:700">343 kcal to reach today's goal</div>
+      <div style="font-size:13.5px;color:{{ textSecondary }};line-height:1.5;font-weight:500;margin-top:2px">Try adding Oatcakes with almond butter — 220 kcal · 6g protein</div>
+      <button onClick="{{ addBoostToToday }}" style="margin-top:14px;height:44px;padding:0 16px;border-radius:999px;background:{{ boostBtnBg }};color:#fff;border:none;font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:6px;cursor:pointer">
+        {{ boostBtnLabel }}<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <!-- Today's meals -->
+    <div style="padding:20px 20px 6px;font-size:12.5px;font-weight:700;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.4px">Today's meals</div>
+
+    <!-- Breakfast — 5/5 logged -->
+    <div style="margin:8px 20px 0;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 14px 30px rgba(30,28,24,.1);overflow:hidden">
+      <image-slot id="meal-breakfast" shape="rect" placeholder="Breakfast photo" src="assets/img/meal-breakfast.jpg" style="width:100%;height:110px"></image-slot>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px">
+        <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.5" stroke="#d98816" stroke-width="1.7"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="#d98816" stroke-width="1.5" stroke-linecap="round"/></svg>Breakfast · 5/5 · 342 kcal</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:{{ textSecondary }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>7:30 AM</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;background:#4A6B8A;flex-shrink:0;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span style="flex:1;font-size:13.5px;font-weight:600">GF oats (40g dry)</span><span style="font-size:13px;font-weight:800;font-family:'SF Mono',monospace">140 kcal</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;background:#4A6B8A;flex-shrink:0;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span style="flex:1;font-size:13.5px;font-weight:600">Lactose-free semi-skimmed milk</span><span style="font-size:13px;font-weight:800;font-family:'SF Mono',monospace">90 kcal</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;background:#4A6B8A;flex-shrink:0;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span style="flex:1;font-size:13.5px;font-weight:600">Ripe banana (½)</span><span style="font-size:13px;font-weight:800;font-family:'SF Mono',monospace">45 kcal</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;background:#4A6B8A;flex-shrink:0;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span style="flex:1;font-size:13.5px;font-weight:600">Blueberries (80g)</span><span style="font-size:13px;font-weight:800;font-family:'SF Mono',monospace">45 kcal</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;background:#4A6B8A;flex-shrink:0;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span style="flex:1;font-size:13.5px;font-weight:600">Runny honey (1 tsp)</span><span style="font-size:13px;font-weight:800;font-family:'SF Mono',monospace">22 kcal</span></div>
+    </div>
+
+    <!-- Mid-morning snack — 2/2 logged -->
+    <div style="margin:14px 20px 0;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 14px 30px rgba(30,28,24,.1);overflow:hidden">
+      <image-slot id="meal-midmorning" shape="rect" placeholder="Mid-morning snack photo" src="assets/img/meal-midmorning.jpg" style="width:100%;height:110px"></image-slot>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px">
+        <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#6B6050" stroke-width="1.6"/><path d="M12 7v5l3.5 2" stroke="#6B6050" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Mid-morning snack · 2/2 · 130 kcal</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:{{ textSecondary }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>10:00 AM</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;background:#4A6B8A;flex-shrink:0;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span style="flex:1;font-size:13.5px;font-weight:600">LF plain yoghurt (150g)</span><span style="font-size:13px;font-weight:800;font-family:'SF Mono',monospace">85 kcal</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;background:#4A6B8A;flex-shrink:0;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span style="flex:1;font-size:13.5px;font-weight:600">Kiwi fruit (1, peeled)</span><span style="font-size:13px;font-weight:800;font-family:'SF Mono',monospace">45 kcal</span></div>
+    </div>
+
+    <!-- Lunch — 4/4 logged -->
+    <div style="margin:14px 20px 0;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 14px 30px rgba(30,28,24,.1);overflow:hidden">
+      <image-slot id="meal-lunch" shape="rect" placeholder="Lunch photo" src="assets/img/meal-lunch.jpg" style="width:100%;height:110px"></image-slot>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px">
+        <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 8h12l-1.2 10.2a2 2 0 01-2 1.8H9.2a2 2 0 01-2-1.8L6 8z" stroke="#4F7A63" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Lunch · 4/4 · 455 kcal</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:{{ textSecondary }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>1:00 PM</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;background:#4A6B8A;flex-shrink:0;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span style="flex:1;font-size:13.5px;font-weight:600">Poached salmon fillet (150g)</span><span style="font-size:13px;font-weight:800;font-family:'SF Mono',monospace">280 kcal</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;background:#4A6B8A;flex-shrink:0;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span style="flex:1;font-size:13.5px;font-weight:600">Mashed sweet potato (200g)</span><span style="font-size:13px;font-weight:800;font-family:'SF Mono',monospace">90 kcal</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;background:#4A6B8A;flex-shrink:0;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px;font-weight:600">Steamed courgette &amp; carrot (150g)</span><span style="flex-shrink:0;font-size:13px;font-weight:800;font-family:'SF Mono',monospace">45 kcal</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;background:#4A6B8A;flex-shrink:0;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span style="flex:1;font-size:13.5px;font-weight:600">Olive oil drizzle (1 tsp)</span><span style="font-size:13px;font-weight:800;font-family:'SF Mono',monospace">40 kcal</span></div>
+    </div>
+
+    <!-- Afternoon snack — 2/2 logged -->
+    <div style="margin:14px 20px 0;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 14px 30px rgba(30,28,24,.1);overflow:hidden">
+      <image-slot id="meal-afternoon" shape="rect" placeholder="Afternoon snack photo" src="assets/img/meal-afternoon.jpg" style="width:100%;height:110px"></image-slot>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px">
+        <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#6B6050" stroke-width="1.6"/><path d="M12 7v5l3.5 2" stroke="#6B6050" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Afternoon snack · 2/2 · 130 kcal</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:{{ textSecondary }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>4:00 PM</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;background:#4A6B8A;flex-shrink:0;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span style="flex:1;font-size:13.5px;font-weight:600">Plain rice cakes (3)</span><span style="font-size:13px;font-weight:800;font-family:'SF Mono',monospace">75 kcal</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;background:#4A6B8A;flex-shrink:0;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span style="flex:1;font-size:13.5px;font-weight:600">Smooth almond butter (1 tsp)</span><span style="font-size:13px;font-weight:800;font-family:'SF Mono',monospace">55 kcal</span></div>
+    </div>
+
+    <!-- Dinner — not logged -->
+    <div style="margin:14px 20px 0;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 14px 30px rgba(30,28,24,.1);overflow:hidden">
+      <image-slot id="meal-dinner" shape="rect" placeholder="Dinner photo" src="assets/img/meal-dinner.jpg" style="width:100%;height:110px"></image-slot>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px">
+        <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z" stroke="#4A6B8A" stroke-width="1.7" stroke-linejoin="round"/></svg>Dinner · 0/4 · 0 kcal</span>
+        <span style="font-size:11.5px;font-weight:700;color:{{ textSecondary }};background:{{ hairlineSoft }};padding:4px 10px;border-radius:999px;letter-spacing:.3px">NOT LOGGED</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;border:1.5px solid {{ hairlineStrong }};flex-shrink:0"></span><span style="flex:1;font-size:13.5px;font-weight:600">Skinless chicken breast (160g)</span><span style="font-size:13px;font-weight:800;font-family:'SF Mono',monospace;color:{{ textSecondary }}">250 kcal</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;border:1.5px solid {{ hairlineStrong }};flex-shrink:0"></span><span style="flex:1;font-size:13.5px;font-weight:600">White basmati rice (60g dry)</span><span style="font-size:13px;font-weight:800;font-family:'SF Mono',monospace;color:{{ textSecondary }}">210 kcal</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;border:1.5px solid {{ hairlineStrong }};flex-shrink:0"></span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px;font-weight:600">Steamed green beans &amp; spinach</span><span style="flex-shrink:0;font-size:13px;font-weight:800;font-family:'SF Mono',monospace;color:{{ textSecondary }}">30 kcal</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;border:1.5px solid {{ hairlineStrong }};flex-shrink:0"></span><span style="flex:1;font-size:13.5px;font-weight:600">Garlic-infused olive oil (1 tsp)</span><span style="font-size:13px;font-weight:800;font-family:'SF Mono',monospace;color:{{ textSecondary }}">40 kcal</span></div>
+    </div>
+
+    <!-- Evening snack — not logged -->
+    <div style="margin:14px 20px 0;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 14px 30px rgba(30,28,24,.1);overflow:hidden">
+      <image-slot id="meal-eveningsnack" shape="rect" placeholder="Evening snack photo" src="assets/img/meal-evening.jpg" style="width:100%;height:110px"></image-slot>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px">
+        <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z" stroke="#4A6B8A" stroke-width="1.7" stroke-linejoin="round"/></svg>Evening snack · 0/2 · 0 kcal</span>
+        <span style="font-size:11.5px;font-weight:700;color:{{ textSecondary }};background:{{ hairlineSoft }};padding:4px 10px;border-radius:999px;letter-spacing:.3px">NOT LOGGED</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;border:1.5px solid {{ hairlineStrong }};flex-shrink:0"></span><span style="flex:1;font-size:13.5px;font-weight:600">LF warm milk (200ml)</span><span style="font-size:13px;font-weight:800;font-family:'SF Mono',monospace;color:{{ textSecondary }}">90 kcal</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid {{ hairlineSoft }}"><span style="width:26px;height:26px;border-radius:50%;border:1.5px solid {{ hairlineStrong }};flex-shrink:0"></span><span style="flex:1;font-size:13.5px;font-weight:600">Ripe peeled pear (small)</span><span style="font-size:13px;font-weight:800;font-family:'SF Mono',monospace;color:{{ textSecondary }}">60 kcal</span></div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isWeek }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:0 20px 4px;font-size:14px;line-height:1.5;color:{{ textSecondary }};font-weight:500">Your last 7 days, at a glance.</div>
+
+    <div style="margin:10px 20px 0;padding:18px 20px;border-radius:24px;background:linear-gradient(160deg,rgba(255,255,255,.92),{{ glassBgStrong }});backdrop-filter:blur(24px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 18px 36px rgba(30,28,24,.12),0 1px 0 {{ glassBgLight }} inset">
+      <div style="font-size:12.5px;font-weight:700;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.4px">This week</div>
+      <div style="display:flex;margin-top:12px">
+        <div style="flex:1;text-align:center"><div style="font-size:20px;font-weight:800;font-family:ui-monospace,monospace">1,656</div><div style="font-size:11px;color:{{ textSecondary }};font-weight:600;margin-top:1px">avg kcal/day</div></div>
+        <div style="flex:1;text-align:center;border-left:1px solid {{ hairline }};border-right:1px solid {{ hairline }}"><div style="font-size:20px;font-weight:800;font-family:ui-monospace,monospace">68g</div><div style="font-size:11px;color:{{ textSecondary }};font-weight:600;margin-top:1px">avg protein</div></div>
+        <div style="flex:1;text-align:center"><div style="font-size:20px;font-weight:800;font-family:ui-monospace,monospace">6/7</div><div style="font-size:11px;color:{{ textSecondary }};font-weight:600;margin-top:1px">days logged</div></div>
+      </div>
+    </div>
+
+    <div style="padding:20px 20px 6px;font-size:12.5px;font-weight:700;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.4px">Day by day</div>
+    <div style="margin:8px 20px 0;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 14px 28px rgba(30,28,24,.1);overflow:hidden">
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid {{ hairlineSoft }}">
+        <span style="width:42px;height:42px;border-radius:13px;background:{{ hairlineSoft }};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:10px;font-weight:700;color:{{ textSecondary }};text-transform:uppercase">Wed</span><span style="font-size:14px;font-weight:800">5</span></span>
+        <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">Wednesday</div><div style="font-size:12px;color:{{ textSecondary }};font-weight:600;margin-top:1px">6/6 meals logged</div></div>
+        <div style="text-align:right;flex-shrink:0"><div style="font-size:14px;font-weight:800;font-family:ui-monospace,monospace">1,680</div><div style="height:4px;width:56px;border-radius:999px;background:rgba(30,28,24,.1);margin-top:5px;overflow:hidden;margin-left:auto"><div style="width:93%;height:100%;background:#4A6B8A"></div></div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid {{ hairlineSoft }}">
+        <span style="width:42px;height:42px;border-radius:13px;background:{{ hairlineSoft }};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:10px;font-weight:700;color:{{ textSecondary }};text-transform:uppercase">Thu</span><span style="font-size:14px;font-weight:800">6</span></span>
+        <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">Thursday</div><div style="font-size:12px;color:{{ textSecondary }};font-weight:600;margin-top:1px">6/6 meals logged</div></div>
+        <div style="text-align:right;flex-shrink:0"><div style="font-size:14px;font-weight:800;font-family:ui-monospace,monospace">1,750</div><div style="height:4px;width:56px;border-radius:999px;background:rgba(30,28,24,.1);margin-top:5px;overflow:hidden;margin-left:auto"><div style="width:97%;height:100%;background:#4A6B8A"></div></div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid {{ hairlineSoft }}">
+        <span style="width:42px;height:42px;border-radius:13px;background:{{ hairlineSoft }};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:10px;font-weight:700;color:{{ textSecondary }};text-transform:uppercase">Fri</span><span style="font-size:14px;font-weight:800">7</span></span>
+        <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:{{ textSecondary }}">Friday</div><div style="font-size:12px;color:{{ textSecondary }};font-weight:600;margin-top:1px">Not logged</div></div>
+        <div style="text-align:right;flex-shrink:0"><div style="font-size:14px;font-weight:800;font-family:ui-monospace,monospace;color:{{ textSecondary }}">—</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid {{ hairlineSoft }}">
+        <span style="width:42px;height:42px;border-radius:13px;background:{{ hairlineSoft }};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:10px;font-weight:700;color:{{ textSecondary }};text-transform:uppercase">Sat</span><span style="font-size:14px;font-weight:800">8</span></span>
+        <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">Saturday</div><div style="font-size:12px;color:{{ textSecondary }};font-weight:600;margin-top:1px">6/6 meals logged</div></div>
+        <div style="text-align:right;flex-shrink:0"><div style="font-size:14px;font-weight:800;font-family:ui-monospace,monospace">1,820</div><div style="height:4px;width:56px;border-radius:999px;background:rgba(30,28,24,.1);margin-top:5px;overflow:hidden;margin-left:auto"><div style="width:100%;height:100%;background:#4A6B8A"></div></div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid {{ hairlineSoft }}">
+        <span style="width:42px;height:42px;border-radius:13px;background:{{ hairlineSoft }};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:10px;font-weight:700;color:{{ textSecondary }};text-transform:uppercase">Sun</span><span style="font-size:14px;font-weight:800">9</span></span>
+        <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">Sunday</div><div style="font-size:12px;color:{{ textSecondary }};font-weight:600;margin-top:1px">5/6 meals logged</div></div>
+        <div style="text-align:right;flex-shrink:0"><div style="font-size:14px;font-weight:800;font-family:ui-monospace,monospace">1,690</div><div style="height:4px;width:56px;border-radius:999px;background:rgba(30,28,24,.1);margin-top:5px;overflow:hidden;margin-left:auto"><div style="width:94%;height:100%;background:#4A6B8A"></div></div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid {{ hairlineSoft }}">
+        <span style="width:42px;height:42px;border-radius:13px;background:{{ hairlineSoft }};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:10px;font-weight:700;color:{{ textSecondary }};text-transform:uppercase">Mon</span><span style="font-size:14px;font-weight:800">10</span></span>
+        <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">Monday</div><div style="font-size:12px;color:{{ textSecondary }};font-weight:600;margin-top:1px">6/6 meals logged</div></div>
+        <div style="text-align:right;flex-shrink:0"><div style="font-size:14px;font-weight:800;font-family:ui-monospace,monospace">1,940</div><div style="height:4px;width:56px;border-radius:999px;background:rgba(30,28,24,.1);margin-top:5px;overflow:hidden;margin-left:auto"><div style="width:100%;height:100%;background:#4A6B8A"></div></div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 18px">
+        <span style="width:42px;height:42px;border-radius:13px;background:#4A6B8A;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:10px;font-weight:700;color:#fff;text-transform:uppercase">Tue</span><span style="font-size:14px;font-weight:800;color:#fff">11</span></span>
+        <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">Today</div><div style="font-size:12px;color:{{ textSecondary }};font-weight:600;margin-top:1px">3/6 meals logged so far</div></div>
+        <div style="text-align:right;flex-shrink:0"><div style="font-size:14px;font-weight:800;font-family:ui-monospace,monospace;color:#4A6B8A">1,057</div><div style="height:4px;width:56px;border-radius:999px;background:rgba(30,28,24,.1);margin-top:5px;overflow:hidden;margin-left:auto"><div style="width:59%;height:100%;background:#4A6B8A"></div></div></div>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isCalendar }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:0 20px 4px;font-size:14px;line-height:1.5;color:{{ textSecondary }};font-weight:500">Tap any day to see what you logged.</div>
+
+    <div style="margin:10px 20px 0;padding:18px;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 14px 28px rgba(30,28,24,.1)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <button aria-label="Previous month" onClick="{{ monthNotAvailable }}" style="width:34px;height:34px;border-radius:50%;background:{{ hairlineSoft }};border:none;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="#1E1C18" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <span style="font-size:15px;font-weight:800;font-family:ui-serif,Georgia,serif">{{ calMonthLabel }}</span>
+        <button aria-label="Next month" onClick="{{ monthNotAvailable }}" style="width:34px;height:34px;border-radius:50%;background:{{ hairlineSoft }};border:none;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#1E1C18" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:11px;font-weight:700;color:{{ textSecondary }};text-transform:uppercase;margin-bottom:6px">
+        <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">
+        <div></div><div></div><div></div><div></div><div></div>
+        <button onClick="{{ selectDay1 }}" style="aspect-ratio:1;border-radius:{{ day1Radius }};background:{{ day1Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day1Weight }};color:{{ day1Color }}">1</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day1DotBg }}"></span></button><button onClick="{{ selectDay2 }}" style="aspect-ratio:1;border-radius:{{ day2Radius }};background:{{ day2Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day2Weight }};color:{{ day2Color }}">2</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day2DotBg }}"></span></button><button onClick="{{ selectDay3 }}" style="aspect-ratio:1;border-radius:{{ day3Radius }};background:{{ day3Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day3Weight }};color:{{ day3Color }}">3</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day3DotBg }}"></span></button><button onClick="{{ selectDay4 }}" style="aspect-ratio:1;border-radius:{{ day4Radius }};background:{{ day4Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day4Weight }};color:{{ day4Color }}">4</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day4DotBg }}"></span></button><button onClick="{{ selectDay5 }}" style="aspect-ratio:1;border-radius:{{ day5Radius }};background:{{ day5Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day5Weight }};color:{{ day5Color }}">5</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day5DotBg }}"></span></button><button onClick="{{ selectDay6 }}" style="aspect-ratio:1;border-radius:{{ day6Radius }};background:{{ day6Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day6Weight }};color:{{ day6Color }}">6</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day6DotBg }}"></span></button><button onClick="{{ selectDay7 }}" style="aspect-ratio:1;border-radius:{{ day7Radius }};background:{{ day7Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day7Weight }};color:{{ day7Color }}">7</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day7DotBg }}"></span></button><button onClick="{{ selectDay8 }}" style="aspect-ratio:1;border-radius:{{ day8Radius }};background:{{ day8Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day8Weight }};color:{{ day8Color }}">8</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day8DotBg }}"></span></button><button onClick="{{ selectDay9 }}" style="aspect-ratio:1;border-radius:{{ day9Radius }};background:{{ day9Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day9Weight }};color:{{ day9Color }}">9</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day9DotBg }}"></span></button><button onClick="{{ selectDay10 }}" style="aspect-ratio:1;border-radius:{{ day10Radius }};background:{{ day10Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day10Weight }};color:{{ day10Color }}">10</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day10DotBg }}"></span></button><button onClick="{{ selectDay11 }}" style="aspect-ratio:1;border-radius:{{ day11Radius }};background:{{ day11Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day11Weight }};color:{{ day11Color }}">11</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day11DotBg }}"></span></button><button onClick="{{ selectDay12 }}" style="aspect-ratio:1;border-radius:{{ day12Radius }};background:{{ day12Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day12Weight }};color:{{ day12Color }}">12</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day12DotBg }}"></span></button><button onClick="{{ selectDay13 }}" style="aspect-ratio:1;border-radius:{{ day13Radius }};background:{{ day13Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day13Weight }};color:{{ day13Color }}">13</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day13DotBg }}"></span></button><button onClick="{{ selectDay14 }}" style="aspect-ratio:1;border-radius:{{ day14Radius }};background:{{ day14Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day14Weight }};color:{{ day14Color }}">14</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day14DotBg }}"></span></button><button onClick="{{ selectDay15 }}" style="aspect-ratio:1;border-radius:{{ day15Radius }};background:{{ day15Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day15Weight }};color:{{ day15Color }}">15</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day15DotBg }}"></span></button><button onClick="{{ selectDay16 }}" style="aspect-ratio:1;border-radius:{{ day16Radius }};background:{{ day16Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day16Weight }};color:{{ day16Color }}">16</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day16DotBg }}"></span></button><button onClick="{{ selectDay17 }}" style="aspect-ratio:1;border-radius:{{ day17Radius }};background:{{ day17Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day17Weight }};color:{{ day17Color }}">17</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day17DotBg }}"></span></button><button onClick="{{ selectDay18 }}" style="aspect-ratio:1;border-radius:{{ day18Radius }};background:{{ day18Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day18Weight }};color:{{ day18Color }}">18</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day18DotBg }}"></span></button><button onClick="{{ selectDay19 }}" style="aspect-ratio:1;border-radius:{{ day19Radius }};background:{{ day19Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day19Weight }};color:{{ day19Color }}">19</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day19DotBg }}"></span></button><button onClick="{{ selectDay20 }}" style="aspect-ratio:1;border-radius:{{ day20Radius }};background:{{ day20Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day20Weight }};color:{{ day20Color }}">20</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day20DotBg }}"></span></button><button onClick="{{ selectDay21 }}" style="aspect-ratio:1;border-radius:{{ day21Radius }};background:{{ day21Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day21Weight }};color:{{ day21Color }}">21</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day21DotBg }}"></span></button><button onClick="{{ selectDay22 }}" style="aspect-ratio:1;border-radius:{{ day22Radius }};background:{{ day22Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day22Weight }};color:{{ day22Color }}">22</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day22DotBg }}"></span></button><button onClick="{{ selectDay23 }}" style="aspect-ratio:1;border-radius:{{ day23Radius }};background:{{ day23Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day23Weight }};color:{{ day23Color }}">23</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day23DotBg }}"></span></button><button onClick="{{ selectDay24 }}" style="aspect-ratio:1;border-radius:{{ day24Radius }};background:{{ day24Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day24Weight }};color:{{ day24Color }}">24</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day24DotBg }}"></span></button><button onClick="{{ selectDay25 }}" style="aspect-ratio:1;border-radius:{{ day25Radius }};background:{{ day25Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day25Weight }};color:{{ day25Color }}">25</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day25DotBg }}"></span></button><button onClick="{{ selectDay26 }}" style="aspect-ratio:1;border-radius:{{ day26Radius }};background:{{ day26Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day26Weight }};color:{{ day26Color }}">26</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day26DotBg }}"></span></button><button onClick="{{ selectDay27 }}" style="aspect-ratio:1;border-radius:{{ day27Radius }};background:{{ day27Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day27Weight }};color:{{ day27Color }}">27</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day27DotBg }}"></span></button><button onClick="{{ selectDay28 }}" style="aspect-ratio:1;border-radius:{{ day28Radius }};background:{{ day28Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day28Weight }};color:{{ day28Color }}">28</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day28DotBg }}"></span></button><button onClick="{{ selectDay29 }}" style="aspect-ratio:1;border-radius:{{ day29Radius }};background:{{ day29Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day29Weight }};color:{{ day29Color }}">29</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day29DotBg }}"></span></button><button onClick="{{ selectDay30 }}" style="aspect-ratio:1;border-radius:{{ day30Radius }};background:{{ day30Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day30Weight }};color:{{ day30Color }}">30</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day30DotBg }}"></span></button><button onClick="{{ selectDay31 }}" style="aspect-ratio:1;border-radius:{{ day31Radius }};background:{{ day31Bg }};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0"><span style="font-size:13px;font-weight:{{ day31Weight }};color:{{ day31Color }}">31</span><span style="width:4px;height:4px;border-radius:50%;background:{{ day31DotBg }}"></span></button>
+      </div></div>
+
+    <div style="padding:20px 20px 6px;font-size:12.5px;font-weight:700;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.4px">{{ calSelectedLabel }}</div>
+    <div style="margin:8px 20px 0;padding:18px 20px;border-radius:22px;background:linear-gradient(160deg,rgba(255,255,255,.92),{{ glassBgStrong }});backdrop-filter:blur(24px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 14px 30px rgba(30,28,24,.1),0 1px 0 {{ glassBgLight }} inset">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:12.5px;color:{{ textSecondary }};font-weight:600">61g protein · 130g carbs · 34g fat · 3/6 meals logged</div>
+        <div style="font-size:20px;font-weight:800;font-family:ui-rounded,'SF Pro Rounded',sans-serif;color:#4A6B8A;flex-shrink:0">1,057<span style="font-size:13px;color:{{ textSecondary }};font-weight:600"> / 1,800</span></div>
+      </div>
+    </div>
+    </sc-if>
+
+  </div>
+
+  <!-- tab bar -->
+  <div style="position:absolute;z-index:2;left:0;right:0;bottom:0;height:84px;padding-bottom:20px;display:flex;background:{{ glassBg }};backdrop-filter:blur(24px) saturate(160%);border-top:1px solid {{ hairline }}">
+    <a href="KindFare Home Redesign.dc.html" style="text-decoration:none;display:contents"><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:{{ textSecondary }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M4 11.5L12 4l8 7.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9a1 1 0 001 1h10a1 1 0 001-1v-9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span style="font-size:12px;font-weight:600">Home</span>
+    </div></a>
+    <a href="KindFare Shop Redesign.dc.html" style="text-decoration:none;display:contents"><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:{{ textSecondary }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M6 8h12l-1.2 10.2a2 2 0 01-2 1.8H9.2a2 2 0 01-2-1.8L6 8z" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span style="font-size:12px;font-weight:600">Shop</span>
+    </div></a>
+    <a href="KindFare Plan Redesign.dc.html" style="text-decoration:none;display:contents"><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#4A6B8A">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4M22 12v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2h11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span style="font-size:12px;font-weight:600">Plan</span>
+    </div></a>
+    <a href="KindFare Exercises Redesign.dc.html" style="text-decoration:none;display:contents"><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:{{ textSecondary }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M4 12h4l2-7 4 14 2-7h4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span style="font-size:12px;font-weight:600">Exercises</span>
+    </div></a>
+    <a href="KindFare Profile Redesign.dc.html" style="text-decoration:none;display:contents"><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:{{ textSecondary }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2.4"/><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span style="font-size:12px;font-weight:600">Profile</span>
+    </div></a>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { view: 'today', dark: false, stretchDone: false, walkDone: false, scanToast: null };
+  componentDidMount() {
+    try {
+      const toast = localStorage.getItem('kf_scan_toast');
+      if (toast) {
+        localStorage.removeItem('kf_scan_toast');
+        this.setState({ scanToast: toast });
+        setTimeout(() => this.setState({ scanToast: null }), 3200);
+      }
+    } catch (e) {}
+  }
+  renderVals() {
+    const v = this.state.view;
+    const d = this.state.dark;
+    let scanTotals = { kcal: 0, protein: 0, carbs: 0, fat: 0 };
+    try {
+      const raw = localStorage.getItem('kf_scan_totals');
+      if (raw) scanTotals = { ...scanTotals, ...JSON.parse(raw) };
+    } catch (e) {}
+    const baseProtein = 61, baseCarbs = 130, baseFat = 34, baseKcal = 1057, kcalGoal = 1800;
+    const eatenProtein = baseProtein + scanTotals.protein;
+    const eatenCarbs = baseCarbs + scanTotals.carbs;
+    const eatenFat = baseFat + scanTotals.fat;
+    const eatenKcal = baseKcal + scanTotals.kcal;
+    const eatenPct = Math.min(100, Math.round((eatenKcal / kcalGoal) * 100));
+    const activeBg = d ? 'rgba(255,255,255,.18)' : '#fff';
+    const activeColor = d ? '#F5F2EA' : '#1E1C18';
+    const activeShadow = d ? '0 3px 8px rgba(0,0,0,.3),0 1px 0 rgba(255,255,255,.15) inset' : '0 3px 8px rgba(30,28,24,.14),0 1px 0 rgba(255,255,255,.6) inset';
+    const idleBg = 'transparent';
+    const idleColor = d ? '#b3a899' : '#6B6050';
+    const idleShadow = 'none';
+    const themeVals = {
+      dark: d,
+      toggleDark: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState(s => ({ dark: !s.dark })); },
+      outerBg: d
+        ? 'radial-gradient(at 15% 8%,#211f2a 0,transparent 55%),radial-gradient(at 85% 5%,#201e1a 0,transparent 50%),radial-gradient(at 90% 85%,#1a1f22 0,transparent 55%),radial-gradient(at 10% 90%,#211f2a 0,transparent 50%),#1E1C18'
+        : 'radial-gradient(at 15% 8%,#F1F1EA 0,transparent 55%),radial-gradient(at 85% 5%,#EFEFE7 0,transparent 50%),radial-gradient(at 90% 85%,#EEF0E9 0,transparent 55%),radial-gradient(at 10% 90%,#F5F2EA 0,transparent 50%),#F5F2EA',
+      textPrimary: d ? '#F5F2EA' : '#1E1C18',
+      textSecondary: d ? '#b3a899' : '#6B6050',
+      hairline: d ? 'rgba(255,255,255,.12)' : 'rgba(30,28,24,.08)',
+      hairlineSoft: d ? 'rgba(255,255,255,.08)' : 'rgba(30,28,24,.06)',
+      hairlineStrong: d ? 'rgba(255,255,255,.22)' : 'rgba(30,28,24,.18)',
+      glassBg: d ? 'rgba(255,255,255,.08)' : 'rgba(255,255,255,.72)',
+      glassBgStrong: d ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.85)',
+      glassBgLight: d ? 'rgba(255,255,255,.06)' : 'rgba(255,255,255,.6)',
+      glassBgFaint: d ? 'rgba(255,255,255,.04)' : 'rgba(255,255,255,.4)',
+    };
+    return {
+      ...themeVals,
+      scanToast: this.state.scanToast,
+      eatenProtein, eatenCarbs, eatenFat,
+      eatenKcal: eatenKcal.toLocaleString(),
+      eatenPct,
+      isToday: v === 'today',
+      isWeek: v === 'week',
+      isCalendar: v === 'calendar',
+      headerTitle: v === 'today' ? 'Today' : (v === 'week' ? 'Week' : 'Calendar'),
+      setToday: () => { if (window.KindFareSound) window.KindFareSound.tabSwitch(); this.setState({ view: 'today' }); },
+      setWeek: () => { if (window.KindFareSound) window.KindFareSound.tabSwitch(); this.setState({ view: 'week' }); },
+      setCalendar: () => { if (window.KindFareSound) window.KindFareSound.tabSwitch(); this.setState({ view: 'calendar' }); },
+      todayBg: v === 'today' ? activeBg : idleBg,
+      todayColor: v === 'today' ? activeColor : idleColor,
+      todayShadow: v === 'today' ? activeShadow : idleShadow,
+      weekBg: v === 'week' ? activeBg : idleBg,
+      weekColor: v === 'week' ? activeColor : idleColor,
+      weekShadow: v === 'week' ? activeShadow : idleShadow,
+      calBg: v === 'calendar' ? activeBg : idleBg,
+      calColor: v === 'calendar' ? activeColor : idleColor,
+      calShadow: v === 'calendar' ? activeShadow : idleShadow,
+      selectedDay: this.state.selectedDay || 11,
+      calMonthLabel: 'August 2026',
+      monthNotAvailable: () => { if (window.KindFareSound) window.KindFareSound.notify(); },
+      calSelectedLabel: (() => { const dd = this.state.selectedDay || 11; const wd = new Date(2026, 7, dd).toLocaleDateString('en-GB', { weekday: 'long' }); return wd + ', August ' + dd; })(),
+      selectDay1: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 1 }); },
+      day1Radius: this.state.selectedDay === 1 ? '50%' : '12px',
+      day1Bg: this.state.selectedDay === 1 ? '#4A6B8A' : 'transparent',
+      day1Color: this.state.selectedDay === 1 ? '#fff' : (1 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day1Weight: this.state.selectedDay === 1 ? '800' : (false ? '700' : '600'),
+      day1DotBg: this.state.selectedDay === 1 ? '#fff' : 'transparent',
+      selectDay2: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 2 }); },
+      day2Radius: this.state.selectedDay === 2 ? '50%' : '12px',
+      day2Bg: this.state.selectedDay === 2 ? '#4A6B8A' : 'transparent',
+      day2Color: this.state.selectedDay === 2 ? '#fff' : (2 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day2Weight: this.state.selectedDay === 2 ? '800' : (false ? '700' : '600'),
+      day2DotBg: this.state.selectedDay === 2 ? '#fff' : 'transparent',
+      selectDay3: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 3 }); },
+      day3Radius: this.state.selectedDay === 3 ? '50%' : '12px',
+      day3Bg: this.state.selectedDay === 3 ? '#4A6B8A' : 'transparent',
+      day3Color: this.state.selectedDay === 3 ? '#fff' : (3 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day3Weight: this.state.selectedDay === 3 ? '800' : (false ? '700' : '600'),
+      day3DotBg: this.state.selectedDay === 3 ? '#fff' : 'transparent',
+      selectDay4: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 4 }); },
+      day4Radius: this.state.selectedDay === 4 ? '50%' : '12px',
+      day4Bg: this.state.selectedDay === 4 ? '#4A6B8A' : 'transparent',
+      day4Color: this.state.selectedDay === 4 ? '#fff' : (4 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day4Weight: this.state.selectedDay === 4 ? '800' : (false ? '700' : '600'),
+      day4DotBg: this.state.selectedDay === 4 ? '#fff' : 'transparent',
+      selectDay5: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 5 }); },
+      day5Radius: this.state.selectedDay === 5 ? '50%' : '12px',
+      day5Bg: this.state.selectedDay === 5 ? '#4A6B8A' : 'transparent',
+      day5Color: this.state.selectedDay === 5 ? '#fff' : (5 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day5Weight: this.state.selectedDay === 5 ? '800' : (true ? '700' : '600'),
+      day5DotBg: this.state.selectedDay === 5 ? '#fff' : '#4F7A63',
+      selectDay6: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 6 }); },
+      day6Radius: this.state.selectedDay === 6 ? '50%' : '12px',
+      day6Bg: this.state.selectedDay === 6 ? '#4A6B8A' : 'transparent',
+      day6Color: this.state.selectedDay === 6 ? '#fff' : (6 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day6Weight: this.state.selectedDay === 6 ? '800' : (true ? '700' : '600'),
+      day6DotBg: this.state.selectedDay === 6 ? '#fff' : '#4F7A63',
+      selectDay7: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 7 }); },
+      day7Radius: this.state.selectedDay === 7 ? '50%' : '12px',
+      day7Bg: this.state.selectedDay === 7 ? '#4A6B8A' : 'transparent',
+      day7Color: this.state.selectedDay === 7 ? '#fff' : (7 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day7Weight: this.state.selectedDay === 7 ? '800' : (false ? '700' : '600'),
+      day7DotBg: this.state.selectedDay === 7 ? '#fff' : 'transparent',
+      selectDay8: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 8 }); },
+      day8Radius: this.state.selectedDay === 8 ? '50%' : '12px',
+      day8Bg: this.state.selectedDay === 8 ? '#4A6B8A' : 'transparent',
+      day8Color: this.state.selectedDay === 8 ? '#fff' : (8 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day8Weight: this.state.selectedDay === 8 ? '800' : (true ? '700' : '600'),
+      day8DotBg: this.state.selectedDay === 8 ? '#fff' : '#4F7A63',
+      selectDay9: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 9 }); },
+      day9Radius: this.state.selectedDay === 9 ? '50%' : '12px',
+      day9Bg: this.state.selectedDay === 9 ? '#4A6B8A' : 'transparent',
+      day9Color: this.state.selectedDay === 9 ? '#fff' : (9 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day9Weight: this.state.selectedDay === 9 ? '800' : (true ? '700' : '600'),
+      day9DotBg: this.state.selectedDay === 9 ? '#fff' : '#4F7A63',
+      selectDay10: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 10 }); },
+      day10Radius: this.state.selectedDay === 10 ? '50%' : '12px',
+      day10Bg: this.state.selectedDay === 10 ? '#4A6B8A' : 'transparent',
+      day10Color: this.state.selectedDay === 10 ? '#fff' : (10 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day10Weight: this.state.selectedDay === 10 ? '800' : (true ? '700' : '600'),
+      day10DotBg: this.state.selectedDay === 10 ? '#fff' : '#4F7A63',
+      selectDay11: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 11 }); },
+      day11Radius: this.state.selectedDay === 11 ? '50%' : '12px',
+      day11Bg: this.state.selectedDay === 11 ? '#4A6B8A' : 'transparent',
+      day11Color: this.state.selectedDay === 11 ? '#fff' : (11 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day11Weight: this.state.selectedDay === 11 ? '800' : (false ? '700' : '600'),
+      day11DotBg: this.state.selectedDay === 11 ? '#fff' : 'transparent',
+      selectDay12: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 12 }); },
+      day12Radius: this.state.selectedDay === 12 ? '50%' : '12px',
+      day12Bg: this.state.selectedDay === 12 ? '#4A6B8A' : 'transparent',
+      day12Color: this.state.selectedDay === 12 ? '#fff' : (12 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day12Weight: this.state.selectedDay === 12 ? '800' : (false ? '700' : '600'),
+      day12DotBg: this.state.selectedDay === 12 ? '#fff' : 'transparent',
+      selectDay13: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 13 }); },
+      day13Radius: this.state.selectedDay === 13 ? '50%' : '12px',
+      day13Bg: this.state.selectedDay === 13 ? '#4A6B8A' : 'transparent',
+      day13Color: this.state.selectedDay === 13 ? '#fff' : (13 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day13Weight: this.state.selectedDay === 13 ? '800' : (false ? '700' : '600'),
+      day13DotBg: this.state.selectedDay === 13 ? '#fff' : 'transparent',
+      selectDay14: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 14 }); },
+      day14Radius: this.state.selectedDay === 14 ? '50%' : '12px',
+      day14Bg: this.state.selectedDay === 14 ? '#4A6B8A' : 'transparent',
+      day14Color: this.state.selectedDay === 14 ? '#fff' : (14 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day14Weight: this.state.selectedDay === 14 ? '800' : (false ? '700' : '600'),
+      day14DotBg: this.state.selectedDay === 14 ? '#fff' : 'transparent',
+      selectDay15: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 15 }); },
+      day15Radius: this.state.selectedDay === 15 ? '50%' : '12px',
+      day15Bg: this.state.selectedDay === 15 ? '#4A6B8A' : 'transparent',
+      day15Color: this.state.selectedDay === 15 ? '#fff' : (15 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day15Weight: this.state.selectedDay === 15 ? '800' : (false ? '700' : '600'),
+      day15DotBg: this.state.selectedDay === 15 ? '#fff' : 'transparent',
+      selectDay16: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 16 }); },
+      day16Radius: this.state.selectedDay === 16 ? '50%' : '12px',
+      day16Bg: this.state.selectedDay === 16 ? '#4A6B8A' : 'transparent',
+      day16Color: this.state.selectedDay === 16 ? '#fff' : (16 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day16Weight: this.state.selectedDay === 16 ? '800' : (false ? '700' : '600'),
+      day16DotBg: this.state.selectedDay === 16 ? '#fff' : 'transparent',
+      selectDay17: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 17 }); },
+      day17Radius: this.state.selectedDay === 17 ? '50%' : '12px',
+      day17Bg: this.state.selectedDay === 17 ? '#4A6B8A' : 'transparent',
+      day17Color: this.state.selectedDay === 17 ? '#fff' : (17 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day17Weight: this.state.selectedDay === 17 ? '800' : (false ? '700' : '600'),
+      day17DotBg: this.state.selectedDay === 17 ? '#fff' : 'transparent',
+      selectDay18: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 18 }); },
+      day18Radius: this.state.selectedDay === 18 ? '50%' : '12px',
+      day18Bg: this.state.selectedDay === 18 ? '#4A6B8A' : 'transparent',
+      day18Color: this.state.selectedDay === 18 ? '#fff' : (18 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day18Weight: this.state.selectedDay === 18 ? '800' : (false ? '700' : '600'),
+      day18DotBg: this.state.selectedDay === 18 ? '#fff' : 'transparent',
+      selectDay19: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 19 }); },
+      day19Radius: this.state.selectedDay === 19 ? '50%' : '12px',
+      day19Bg: this.state.selectedDay === 19 ? '#4A6B8A' : 'transparent',
+      day19Color: this.state.selectedDay === 19 ? '#fff' : (19 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day19Weight: this.state.selectedDay === 19 ? '800' : (false ? '700' : '600'),
+      day19DotBg: this.state.selectedDay === 19 ? '#fff' : 'transparent',
+      selectDay20: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 20 }); },
+      day20Radius: this.state.selectedDay === 20 ? '50%' : '12px',
+      day20Bg: this.state.selectedDay === 20 ? '#4A6B8A' : 'transparent',
+      day20Color: this.state.selectedDay === 20 ? '#fff' : (20 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day20Weight: this.state.selectedDay === 20 ? '800' : (false ? '700' : '600'),
+      day20DotBg: this.state.selectedDay === 20 ? '#fff' : 'transparent',
+      selectDay21: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 21 }); },
+      day21Radius: this.state.selectedDay === 21 ? '50%' : '12px',
+      day21Bg: this.state.selectedDay === 21 ? '#4A6B8A' : 'transparent',
+      day21Color: this.state.selectedDay === 21 ? '#fff' : (21 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day21Weight: this.state.selectedDay === 21 ? '800' : (false ? '700' : '600'),
+      day21DotBg: this.state.selectedDay === 21 ? '#fff' : 'transparent',
+      selectDay22: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 22 }); },
+      day22Radius: this.state.selectedDay === 22 ? '50%' : '12px',
+      day22Bg: this.state.selectedDay === 22 ? '#4A6B8A' : 'transparent',
+      day22Color: this.state.selectedDay === 22 ? '#fff' : (22 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day22Weight: this.state.selectedDay === 22 ? '800' : (false ? '700' : '600'),
+      day22DotBg: this.state.selectedDay === 22 ? '#fff' : 'transparent',
+      selectDay23: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 23 }); },
+      day23Radius: this.state.selectedDay === 23 ? '50%' : '12px',
+      day23Bg: this.state.selectedDay === 23 ? '#4A6B8A' : 'transparent',
+      day23Color: this.state.selectedDay === 23 ? '#fff' : (23 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day23Weight: this.state.selectedDay === 23 ? '800' : (false ? '700' : '600'),
+      day23DotBg: this.state.selectedDay === 23 ? '#fff' : 'transparent',
+      selectDay24: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 24 }); },
+      day24Radius: this.state.selectedDay === 24 ? '50%' : '12px',
+      day24Bg: this.state.selectedDay === 24 ? '#4A6B8A' : 'transparent',
+      day24Color: this.state.selectedDay === 24 ? '#fff' : (24 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day24Weight: this.state.selectedDay === 24 ? '800' : (false ? '700' : '600'),
+      day24DotBg: this.state.selectedDay === 24 ? '#fff' : 'transparent',
+      selectDay25: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 25 }); },
+      day25Radius: this.state.selectedDay === 25 ? '50%' : '12px',
+      day25Bg: this.state.selectedDay === 25 ? '#4A6B8A' : 'transparent',
+      day25Color: this.state.selectedDay === 25 ? '#fff' : (25 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day25Weight: this.state.selectedDay === 25 ? '800' : (false ? '700' : '600'),
+      day25DotBg: this.state.selectedDay === 25 ? '#fff' : 'transparent',
+      selectDay26: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 26 }); },
+      day26Radius: this.state.selectedDay === 26 ? '50%' : '12px',
+      day26Bg: this.state.selectedDay === 26 ? '#4A6B8A' : 'transparent',
+      day26Color: this.state.selectedDay === 26 ? '#fff' : (26 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day26Weight: this.state.selectedDay === 26 ? '800' : (false ? '700' : '600'),
+      day26DotBg: this.state.selectedDay === 26 ? '#fff' : 'transparent',
+      selectDay27: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 27 }); },
+      day27Radius: this.state.selectedDay === 27 ? '50%' : '12px',
+      day27Bg: this.state.selectedDay === 27 ? '#4A6B8A' : 'transparent',
+      day27Color: this.state.selectedDay === 27 ? '#fff' : (27 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day27Weight: this.state.selectedDay === 27 ? '800' : (false ? '700' : '600'),
+      day27DotBg: this.state.selectedDay === 27 ? '#fff' : 'transparent',
+      selectDay28: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 28 }); },
+      day28Radius: this.state.selectedDay === 28 ? '50%' : '12px',
+      day28Bg: this.state.selectedDay === 28 ? '#4A6B8A' : 'transparent',
+      day28Color: this.state.selectedDay === 28 ? '#fff' : (28 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day28Weight: this.state.selectedDay === 28 ? '800' : (false ? '700' : '600'),
+      day28DotBg: this.state.selectedDay === 28 ? '#fff' : 'transparent',
+      selectDay29: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 29 }); },
+      day29Radius: this.state.selectedDay === 29 ? '50%' : '12px',
+      day29Bg: this.state.selectedDay === 29 ? '#4A6B8A' : 'transparent',
+      day29Color: this.state.selectedDay === 29 ? '#fff' : (29 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day29Weight: this.state.selectedDay === 29 ? '800' : (false ? '700' : '600'),
+      day29DotBg: this.state.selectedDay === 29 ? '#fff' : 'transparent',
+      selectDay30: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 30 }); },
+      day30Radius: this.state.selectedDay === 30 ? '50%' : '12px',
+      day30Bg: this.state.selectedDay === 30 ? '#4A6B8A' : 'transparent',
+      day30Color: this.state.selectedDay === 30 ? '#fff' : (30 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day30Weight: this.state.selectedDay === 30 ? '800' : (false ? '700' : '600'),
+      day30DotBg: this.state.selectedDay === 30 ? '#fff' : 'transparent',
+      selectDay31: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ selectedDay: 31 }); },
+      day31Radius: this.state.selectedDay === 31 ? '50%' : '12px',
+      day31Bg: this.state.selectedDay === 31 ? '#4A6B8A' : 'transparent',
+      day31Color: this.state.selectedDay === 31 ? '#fff' : (31 >= 12 ? '#b4ab9c' : '#1E1C18'),
+      day31Weight: this.state.selectedDay === 31 ? '800' : (false ? '700' : '600'),
+      day31DotBg: this.state.selectedDay === 31 ? '#fff' : 'transparent',
+      toggleStretch: () => { if (window.KindFareSound) window.KindFareSound.success(); this.setState(s => ({ stretchDone: !s.stretchDone })); },
+      toggleWalk: () => { if (window.KindFareSound) window.KindFareSound.success(); this.setState(s => ({ walkDone: !s.walkDone })); },
+      addBoostToToday: () => { if (window.KindFareSound) window.KindFareSound.success(); this.setState({ boostAdded: true }); },
+      stretchDoneBg: this.state.stretchDone ? 'rgba(79,122,99,.12)' : 'rgba(255,255,255,.7)',
+      walkDoneBg: this.state.walkDone ? 'rgba(79,122,99,.12)' : 'rgba(255,255,255,.7)',
+      stretchLabel: this.state.stretchDone ? 'Logged ✓' : 'Log it',
+      walkLabel: this.state.walkDone ? 'Logged ✓' : 'Log it',
+      stretchIconDisplay: this.state.stretchDone ? 'none' : 'block',
+      stretchCheckDisplay: this.state.stretchDone ? 'block' : 'none',
+      walkIconDisplay: this.state.walkDone ? 'none' : 'block',
+      walkCheckDisplay: this.state.walkDone ? 'block' : 'none',
+      boostAdded: !!this.state.boostAdded,
+      boostBtnLabel: this.state.boostAdded ? 'Added' : 'Add to today',
+      boostBtnBg: this.state.boostAdded ? '#4F7A63' : '#4A6B8A',
+    };
+  }
+}
+</script>
+</body>
+</html>
