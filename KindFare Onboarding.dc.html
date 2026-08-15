@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<script src="./kindfare-sound.js"></script>
+<script src="./kindfare-i18n.js"></script>
+<style>
+  body{margin:0}
+  a{color:#4A6B8A}
+  a:hover{color:#3a5670}
+  @keyframes kf-drift1{0%{transform:translate(0,0) scale(1)} 33%{transform:translate(55px,70px) scale(1.25)} 66%{transform:translate(-30px,40px) scale(0.88)} 100%{transform:translate(0,0) scale(1)}}
+  @keyframes kf-drift2{0%{transform:translate(0,0) scale(1)} 33%{transform:translate(-65px,45px) scale(1.2)} 66%{transform:translate(35px,-25px) scale(0.85)} 100%{transform:translate(0,0) scale(1)}}
+  @media (prefers-reduced-motion: reduce){ [style*="kf-drift"]{animation:none !important} }
+  .ob-scroll{scrollbar-width:none}
+  .ob-scroll::-webkit-scrollbar{display:none}
+
+  :focus-visible{outline:2px solid #4A6B8A;outline-offset:2px;border-radius:4px}
+  @keyframes kf-globe-spin{from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
+</style>
+</helmet>
+
+<div style="width:390px;height:844px;position:relative;background:#0d0d10;overflow:hidden;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:#fff;box-shadow:0 30px 70px rgba(0,0,0,.25)">
+
+  <!-- video background — persists through every step (1-7), including the processing/completion
+       screens. showVideo is hardcoded true in renderVals(); the old light-completion-screen
+       background this used to fall back to was removed below since it can no longer render
+       (dead code was a regression trap for whoever edited this next). -->
+  <sc-if value="{{ showVideo }}" hint-placeholder-val="{{ true }}">
+    <video id="kfOnboardingBgVideo" autoplay muted loop playsinline aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 8%;z-index:0;filter:saturate(1.08) contrast(1.03)">
+      <source src="assets/video/onboarding-bg.mp4" type="video/mp4">
+    </video>
+    <div style="position:absolute;inset:0;z-index:0;background:linear-gradient(to top,rgba(6,7,8,.95) 0%,rgba(10,11,12,.62) 38%,rgba(14,15,16,.28) 65%,rgba(10,10,11,.5) 100%)"></div>
+    <div style="position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse at 50% 30%,transparent 45%,rgba(0,0,0,.45) 100%)"></div>
+    <div style="position:absolute;inset:0;z-index:0;background:linear-gradient(120deg,rgba(74,107,138,.16),transparent 40%,rgba(217,136,22,.1))"></div>
+  </sc-if>
+
+  <div style="position:relative;z-index:1;height:47px;padding:0 26px;display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:8px;font-size:15px;font-weight:600;color:{{ statusColor }}">
+    <span>9:41</span>
+    <span style="display:flex;gap:5px;align-items:center">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/><rect x="5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/><rect x="10" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="1" fill="currentColor" opacity=".4"/></svg>
+      <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="1" y="1" width="21" height="11" rx="3" stroke="currentColor" stroke-width="1"/><rect x="2.5" y="2.5" width="15" height="8" rx="1.5" fill="currentColor"/><rect x="23.5" y="4" width="1.6" height="5" rx="0.8" fill="currentColor"/></svg>
+    </span>
+  </div>
+
+  <!-- top bar: back / progress dots / skip -->
+  <sc-if value="{{ showTopbar }}" hint-placeholder-val="{{ true }}">
+  <div style="position:relative;z-index:1;padding:10px 22px 0">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button aria-label="{{ t_back }}" onClick="{{ goBack }}" disabled="{{ backDisabled }}" style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;flex-shrink:0;opacity:{{ backOpacity }}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div style="flex:1;display:flex;gap:6px">
+        <span style="flex:1;height:4px;border-radius:999px;background:rgba(255,255,255,.2);overflow:hidden"><span style="display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#F0C674,#4A6B8A);width:{{ dot1 }}"></span></span>
+        <span style="flex:1;height:4px;border-radius:999px;background:rgba(255,255,255,.2);overflow:hidden"><span style="display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#F0C674,#4A6B8A);width:{{ dot2 }}"></span></span>
+        <span style="flex:1;height:4px;border-radius:999px;background:rgba(255,255,255,.2);overflow:hidden"><span style="display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#F0C674,#4A6B8A);width:{{ dot3 }}"></span></span>
+        <span style="flex:1;height:4px;border-radius:999px;background:rgba(255,255,255,.2);overflow:hidden"><span style="display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#F0C674,#4A6B8A);width:{{ dot4 }}"></span></span>
+        <span style="flex:1;height:4px;border-radius:999px;background:rgba(255,255,255,.2);overflow:hidden"><span style="display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#F0C674,#4A6B8A);width:{{ dot5 }}"></span></span>
+      </div>
+      <div style="position:relative;flex-shrink:0">
+        <button aria-label="{{ t_language_aria }}" onClick="{{ toggleLangPicker }}" style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M3 12h18" stroke="currentColor" stroke-width="1.7"/><path d="M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9s1.4-6.4 3.8-9z" stroke="currentColor" stroke-width="1.7"/></svg>
+        </button>
+      </div>
+      <button onClick="{{ skip }}" style="background:transparent;border:none;color:rgba(255,255,255,.85);font-size:13.5px;font-weight:700;cursor:pointer;flex-shrink:0">{{ t_skip }}</button>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:1.2px;margin-top:12px">{{ stepCounter }}</div>
+  </div>
+  </sc-if>
+
+  <div class="ob-scroll" style="position:absolute;z-index:1;inset:{{ bodyInset }};overflow-y:auto;padding:26px 24px">
+
+    <!-- Step 0 — Language (new: language now leads onboarding instead of only being reachable via
+         the globe icon overlay mid-flow, styled to match the dark glass-card look of every other
+         step here rather than the light "Clinical Calm" picker used elsewhere in the app). -->
+    <sc-if value="{{ isStep0 }}" hint-placeholder-val="{{ true }}">
+      <div style="margin-top:170px;font-size:28px;font-weight:700;line-height:1.16;font-family:ui-serif,Georgia,serif">{{ t_choose_language }}</div>
+      <div style="display:flex;flex-direction:column;gap:9px;margin-top:22px">
+        <button onClick="{{ setLangEn }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ obLangEnBg }};border:1px solid {{ obLangEnBorder }};border-left:3px solid {{ obLangEnAccent }};cursor:pointer;box-shadow:{{ obLangEnShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(217,136,22,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#F0C674" stroke-width="1.7"/><path d="M3 12h18" stroke="#F0C674" stroke-width="1.7"/><path d="M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9s1.4-6.4 3.8-9z" stroke="#F0C674" stroke-width="1.7"/></svg></span>
+          <span style="flex:1;min-width:0;font-size:14.5px;font-weight:700;color:#fff">English</span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ obLangEnCheckBorder }};background:{{ obLangEnCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ isLangEn }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+        <button onClick="{{ setLangPt }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ obLangPtBg }};border:1px solid {{ obLangPtBorder }};border-left:3px solid {{ obLangPtAccent }};cursor:pointer;box-shadow:{{ obLangPtShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(217,136,22,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#F0C674" stroke-width="1.7"/><path d="M3 12h18" stroke="#F0C674" stroke-width="1.7"/><path d="M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9s1.4-6.4 3.8-9z" stroke="#F0C674" stroke-width="1.7"/></svg></span>
+          <span style="flex:1;min-width:0;font-size:14.5px;font-weight:700;color:#fff">Português</span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ obLangPtCheckBorder }};background:{{ obLangPtCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ isLangPt }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+        <button onClick="{{ setLangHi }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ obLangHiBg }};border:1px solid {{ obLangHiBorder }};border-left:3px solid {{ obLangHiAccent }};cursor:pointer;box-shadow:{{ obLangHiShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(217,136,22,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#F0C674" stroke-width="1.7"/><path d="M3 12h18" stroke="#F0C674" stroke-width="1.7"/><path d="M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9s1.4-6.4 3.8-9z" stroke="#F0C674" stroke-width="1.7"/></svg></span>
+          <span style="flex:1;min-width:0;font-size:14.5px;font-weight:700;color:#fff;font-family:'Noto Sans Devanagari','Inter',sans-serif">हिन्दी</span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ obLangHiCheckBorder }};background:{{ obLangHiCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ isLangHi }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+        <button onClick="{{ setLangEs }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ obLangEsBg }};border:1px solid {{ obLangEsBorder }};border-left:3px solid {{ obLangEsAccent }};cursor:pointer;box-shadow:{{ obLangEsShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(217,136,22,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#F0C674" stroke-width="1.7"/><path d="M3 12h18" stroke="#F0C674" stroke-width="1.7"/><path d="M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9s1.4-6.4 3.8-9z" stroke="#F0C674" stroke-width="1.7"/></svg></span>
+          <span style="flex:1;min-width:0;font-size:14.5px;font-weight:700;color:#fff">Español</span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ obLangEsCheckBorder }};background:{{ obLangEsCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ isLangEs }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+        <button onClick="{{ setLangFr }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ obLangFrBg }};border:1px solid {{ obLangFrBorder }};border-left:3px solid {{ obLangFrAccent }};cursor:pointer;box-shadow:{{ obLangFrShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(217,136,22,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#F0C674" stroke-width="1.7"/><path d="M3 12h18" stroke="#F0C674" stroke-width="1.7"/><path d="M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9s1.4-6.4 3.8-9z" stroke="#F0C674" stroke-width="1.7"/></svg></span>
+          <span style="flex:1;min-width:0;font-size:14.5px;font-weight:700;color:#fff">Français</span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ obLangFrCheckBorder }};background:{{ obLangFrCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ isLangFr }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+        <button onClick="{{ setLangUr }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ obLangUrBg }};border:1px solid {{ obLangUrBorder }};border-left:3px solid {{ obLangUrAccent }};cursor:pointer;box-shadow:{{ obLangUrShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(217,136,22,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#F0C674" stroke-width="1.7"/><path d="M3 12h18" stroke="#F0C674" stroke-width="1.7"/><path d="M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9s1.4-6.4 3.8-9z" stroke="#F0C674" stroke-width="1.7"/></svg></span>
+          <span style="flex:1;min-width:0;font-size:14.5px;font-weight:700;color:#fff;font-family:'Noto Nastaliq Urdu','Inter',sans-serif">اردو</span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ obLangUrCheckBorder }};background:{{ obLangUrCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ isLangUr }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+      </div>
+      <div style="display:flex;justify-content:center;margin-top:24px">
+        <img src="assets/img/kindfare-badge.png" alt="KindFare" style="width:150px;height:50px;object-fit:contain;filter:drop-shadow(0 1px 10px rgba(0,0,0,.5))"/>
+      </div>
+    </sc-if>
+
+    <!-- Step 1 — Name -->
+    <sc-if value="{{ isStep1 }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:220px">
+        <div style="font-size:31px;font-weight:700;line-height:1.14;font-family:ui-serif,Georgia,serif">{{ t_step1_heading }}</div>
+        <div style="font-size:14.5px;line-height:1.55;color:rgba(255,255,255,.72);font-weight:500;margin-top:12px">{{ t_step1_subtitle }}</div>
+        <div style="margin-top:22px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(14px);padding:18px">
+          <div style="font-size:11.5px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">{{ t_step1_label }}</div>
+          <div style="display:flex;align-items:center;height:54px;border-radius:14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);padding:0 6px 0 16px">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;opacity:.6"><circle cx="12" cy="8" r="4" stroke="#fff" stroke-width="1.8"/><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <input type="text" value="{{ name }}" onChange="{{ onNameChange }}" placeholder="{{ t_step1_placeholder }}" aria-label="{{ t_step1_placeholder }}" style="flex:1;height:100%;background:transparent;border:none;color:#fff;font-size:16px;font-weight:700;padding:0 12px;box-sizing:border-box;font-family:inherit"/>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;margin-top:24px">
+        <img src="assets/img/kindfare-badge.png" alt="KindFare" style="width:150px;height:50px;object-fit:contain;filter:drop-shadow(0 1px 10px rgba(0,0,0,.5))"/>
+      </div>
+    </sc-if>
+
+    <!-- Step 2 — About you -->
+    <sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:170px;font-size:28px;font-weight:700;line-height:1.16;font-family:ui-serif,Georgia,serif">{{ t_step2_heading }}</div>
+      <div style="font-size:14.5px;line-height:1.5;color:rgba(255,255,255,.72);font-weight:500;margin-top:10px">{{ t_step2_subtitle }}</div>
+
+      <div style="margin-top:24px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(14px);padding:18px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <div style="font-size:11.5px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px">{{ t_age_label }}</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;height:52px;border-radius:14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);padding:0 8px 0 16px">
+              <span style="font-size:19px;font-weight:800;font-family:ui-monospace,monospace">{{ age }}</span>
+              <div style="display:flex;gap:4px">
+                <button onClick="{{ ageDown }}" aria-label="Decrease age" style="width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.14);border:none;color:#fff;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+                <button onClick="{{ ageUp }}" aria-label="Increase age" style="width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.14);border:none;color:#fff;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11.5px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px">{{ t_weight_label }}</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;height:52px;border-radius:14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);padding:0 8px 0 16px">
+              <span style="font-size:19px;font-weight:800;font-family:ui-monospace,monospace">{{ weight }}</span>
+              <div style="display:flex;gap:4px">
+                <button onClick="{{ weightDown }}" aria-label="Decrease weight" style="width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.14);border:none;color:#fff;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+                <button onClick="{{ weightUp }}" aria-label="Increase weight" style="width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.14);border:none;color:#fff;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:18px">
+          <div style="font-size:11.5px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px">{{ t_sex_label }}</div>
+          <div style="display:flex;gap:6px;background:rgba(255,255,255,.06);border-radius:13px;padding:4px">
+            <button onClick="{{ setSexMale }}" style="flex:1;height:40px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:700;background:{{ sexMaleBg }};color:{{ sexMaleColor }};box-shadow:{{ sexMaleShadow }}">{{ t_male }}</button>
+            <button onClick="{{ setSexFemale }}" style="flex:1;height:40px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:700;background:{{ sexFemaleBg }};color:{{ sexFemaleColor }};box-shadow:{{ sexFemaleShadow }}">{{ t_female }}</button>
+            <button onClick="{{ setSexOther }}" style="flex:1;height:40px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:700;background:{{ sexOtherBg }};color:{{ sexOtherColor }};box-shadow:{{ sexOtherShadow }}">{{ t_other }}</button>
+          </div>
+        </div>
+
+        <div style="margin-top:16px">
+          <div style="font-size:11.5px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px">{{ t_units_label }}</div>
+          <div style="display:flex;gap:6px;background:rgba(255,255,255,.06);border-radius:13px;padding:4px">
+            <button onClick="{{ setUnitsKg }}" style="flex:1;height:40px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:700;background:{{ unitsKgBg }};color:{{ unitsKgColor }};box-shadow:{{ unitsKgShadow }}">kg</button>
+            <button onClick="{{ setUnitsLb }}" style="flex:1;height:40px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:700;background:{{ unitsLbBg }};color:{{ unitsLbColor }};box-shadow:{{ unitsLbShadow }}">lb</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;margin-top:24px">
+        <img src="assets/img/kindfare-badge.png" alt="KindFare" style="width:150px;height:50px;object-fit:contain;filter:drop-shadow(0 1px 10px rgba(0,0,0,.5))"/>
+      </div>
+    </sc-if>
+
+    <!-- Step 3 — Health conditions -->
+    <sc-if value="{{ isStep3 }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:170px;font-size:28px;font-weight:700;line-height:1.16;font-family:ui-serif,Georgia,serif">{{ t_step3_heading }}</div>
+      <div style="font-size:14.5px;line-height:1.5;color:rgba(255,255,255,.72);font-weight:500;margin-top:10px">{{ t_step3_subtitle }}</div>
+
+      <div style="font-size:11.5px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:1px;margin-top:22px;margin-bottom:10px">{{ t_section_energy }}</div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <button onClick="{{ toggleCondCfs }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ condCfsBg }};border:1px solid {{ condCfsBorder }};border-left:3px solid {{ condCfsAccent }};cursor:pointer;box-shadow:{{ condCfsShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(217,136,22,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l2-7 4 14 2-7h4" stroke="#F0C674" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:700;color:#fff">{{ t_cfs_title }}</span><span style="display:block;font-size:12px;color:rgba(255,255,255,.6);font-weight:500;margin-top:2px">{{ t_cfs_desc }}</span></span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ condCfsCheckBorder }};background:{{ condCfsCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ condCfs }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+        <button onClick="{{ toggleCondFibro }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ condFibroBg }};border:1px solid {{ condFibroBorder }};border-left:3px solid {{ condFibroAccent }};cursor:pointer;box-shadow:{{ condFibroShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(217,136,22,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l2-7 4 14 2-7h4" stroke="#F0C674" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:700;color:#fff">{{ t_fibro_title }}</span><span style="display:block;font-size:12px;color:rgba(255,255,255,.6);font-weight:500;margin-top:2px">{{ t_fibro_desc }}</span></span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ condFibroCheckBorder }};background:{{ condFibroCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ condFibro }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+        <button onClick="{{ toggleCondDepression }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ condDepressionBg }};border:1px solid {{ condDepressionBorder }};border-left:3px solid {{ condDepressionAccent }};cursor:pointer;box-shadow:{{ condDepressionShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(217,136,22,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l2-7 4 14 2-7h4" stroke="#F0C674" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:700;color:#fff">{{ t_depression_title }}</span><span style="display:block;font-size:12px;color:rgba(255,255,255,.6);font-weight:500;margin-top:2px">{{ t_depression_desc }}</span></span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ condDepressionCheckBorder }};background:{{ condDepressionCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ condDepression }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+        <button onClick="{{ toggleCondAnxiety }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ condAnxietyBg }};border:1px solid {{ condAnxietyBorder }};border-left:3px solid {{ condAnxietyAccent }};cursor:pointer;box-shadow:{{ condAnxietyShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(217,136,22,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l2-7 4 14 2-7h4" stroke="#F0C674" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:700;color:#fff">{{ t_anxiety_title }}</span><span style="display:block;font-size:12px;color:rgba(255,255,255,.6);font-weight:500;margin-top:2px">{{ t_anxiety_desc }}</span></span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ condAnxietyCheckBorder }};background:{{ condAnxietyCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ condAnxiety }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+        <button onClick="{{ toggleCondInsomnia }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ condInsomniaBg }};border:1px solid {{ condInsomniaBorder }};border-left:3px solid {{ condInsomniaAccent }};cursor:pointer;box-shadow:{{ condInsomniaShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(217,136,22,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l2-7 4 14 2-7h4" stroke="#F0C674" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:700;color:#fff">{{ t_insomnia_title }}</span><span style="display:block;font-size:12px;color:rgba(255,255,255,.6);font-weight:500;margin-top:2px">{{ t_insomnia_desc }}</span></span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ condInsomniaCheckBorder }};background:{{ condInsomniaCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ condInsomnia }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+      </div>
+      <div style="font-size:11.5px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:1px;margin-top:18px;margin-bottom:10px">{{ t_section_diet_weight }}</div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <button onClick="{{ toggleCondLactose }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ condLactoseBg }};border:1px solid {{ condLactoseBorder }};border-left:3px solid {{ condLactoseAccent }};cursor:pointer;box-shadow:{{ condLactoseShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(79,122,99,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.35-9.5-9C.9 8.3 2.6 5 6 5c2 0 3.5 1.2 4 2.2C10.5 6.2 12 5 14 5c3.4 0 5.1 3.3 3.5 7-2.5 4.65-9.5 9-9.5 9z" stroke="#8FBBA0" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+          <span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:700;color:#fff">{{ t_lactose_title }}</span><span style="display:block;font-size:12px;color:rgba(255,255,255,.6);font-weight:500;margin-top:2px">{{ t_lactose_desc }}</span></span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ condLactoseCheckBorder }};background:{{ condLactoseCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ condLactose }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+        <button onClick="{{ toggleCondGluten }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ condGlutenBg }};border:1px solid {{ condGlutenBorder }};border-left:3px solid {{ condGlutenAccent }};cursor:pointer;box-shadow:{{ condGlutenShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(79,122,99,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.35-9.5-9C.9 8.3 2.6 5 6 5c2 0 3.5 1.2 4 2.2C10.5 6.2 12 5 14 5c3.4 0 5.1 3.3 3.5 7-2.5 4.65-9.5 9-9.5 9z" stroke="#8FBBA0" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+          <span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:700;color:#fff">{{ t_gluten_title }}</span><span style="display:block;font-size:12px;color:rgba(255,255,255,.6);font-weight:500;margin-top:2px">{{ t_gluten_desc }}</span></span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ condGlutenCheckBorder }};background:{{ condGlutenCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ condGluten }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+        <button onClick="{{ toggleCondObesity }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ condObesityBg }};border:1px solid {{ condObesityBorder }};border-left:3px solid {{ condObesityAccent }};cursor:pointer;box-shadow:{{ condObesityShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(79,122,99,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.35-9.5-9C.9 8.3 2.6 5 6 5c2 0 3.5 1.2 4 2.2C10.5 6.2 12 5 14 5c3.4 0 5.1 3.3 3.5 7-2.5 4.65-9.5 9-9.5 9z" stroke="#8FBBA0" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+          <span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:700;color:#fff">{{ t_obesity_title }}</span><span style="display:block;font-size:12px;color:rgba(255,255,255,.6);font-weight:500;margin-top:2px">{{ t_obesity_desc }}</span></span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ condObesityCheckBorder }};background:{{ condObesityCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ condObesity }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+      </div>
+      <div style="font-size:11.5px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:1px;margin-top:18px;margin-bottom:10px">{{ t_section_joints }}</div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <button onClick="{{ toggleCondOsteoarthritis }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ condOsteoarthritisBg }};border:1px solid {{ condOsteoarthritisBorder }};border-left:3px solid {{ condOsteoarthritisAccent }};cursor:pointer;box-shadow:{{ condOsteoarthritisShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(74,107,138,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 15a4 4 0 010-6M15 9a4 4 0 010 6M8 8l3 3M13 13l3 3" stroke="#9DB8CC" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+          <span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:700;color:#fff">{{ t_oa_title }}</span><span style="display:block;font-size:12px;color:rgba(255,255,255,.6);font-weight:500;margin-top:2px">{{ t_oa_desc }}</span></span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ condOsteoarthritisCheckBorder }};background:{{ condOsteoarthritisCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ condOsteoarthritis }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+        <button onClick="{{ toggleCondBackPain }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ condBackPainBg }};border:1px solid {{ condBackPainBorder }};border-left:3px solid {{ condBackPainAccent }};cursor:pointer;box-shadow:{{ condBackPainShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(74,107,138,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 15a4 4 0 010-6M15 9a4 4 0 010 6M8 8l3 3M13 13l3 3" stroke="#9DB8CC" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+          <span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:700;color:#fff">{{ t_backpain_title }}</span><span style="display:block;font-size:12px;color:rgba(255,255,255,.6);font-weight:500;margin-top:2px">{{ t_backpain_desc }}</span></span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ condBackPainCheckBorder }};background:{{ condBackPainCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ condBackPain }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+        <button onClick="{{ toggleCondOsteopenia }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ condOsteopeniaBg }};border:1px solid {{ condOsteopeniaBorder }};border-left:3px solid {{ condOsteopeniaAccent }};cursor:pointer;box-shadow:{{ condOsteopeniaShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(74,107,138,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 15a4 4 0 010-6M15 9a4 4 0 010 6M8 8l3 3M13 13l3 3" stroke="#9DB8CC" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+          <span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:700;color:#fff">{{ t_osteopenia_title }}</span><span style="display:block;font-size:12px;color:rgba(255,255,255,.6);font-weight:500;margin-top:2px">{{ t_osteopenia_desc }}</span></span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ condOsteopeniaCheckBorder }};background:{{ condOsteopeniaCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ condOsteopenia }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+        <button onClick="{{ toggleCondOsteoporosis }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ condOsteoporosisBg }};border:1px solid {{ condOsteoporosisBorder }};border-left:3px solid {{ condOsteoporosisAccent }};cursor:pointer;box-shadow:{{ condOsteoporosisShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(74,107,138,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 15a4 4 0 010-6M15 9a4 4 0 010 6M8 8l3 3M13 13l3 3" stroke="#9DB8CC" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+          <span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:700;color:#fff">{{ t_osteoporosis_title }}</span><span style="display:block;font-size:12px;color:rgba(255,255,255,.6);font-weight:500;margin-top:2px">{{ t_osteoporosis_desc }}</span></span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ condOsteoporosisCheckBorder }};background:{{ condOsteoporosisCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ condOsteoporosis }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+        <button onClick="{{ toggleCondSarcopenia }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ condSarcopeniaBg }};border:1px solid {{ condSarcopeniaBorder }};border-left:3px solid {{ condSarcopeniaAccent }};cursor:pointer;box-shadow:{{ condSarcopeniaShadow }}">
+          <span style="width:34px;height:34px;border-radius:10px;background:rgba(74,107,138,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 15a4 4 0 010-6M15 9a4 4 0 010 6M8 8l3 3M13 13l3 3" stroke="#9DB8CC" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+          <span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:700;color:#fff">{{ t_sarcopenia_title }}</span><span style="display:block;font-size:12px;color:rgba(255,255,255,.6);font-weight:500;margin-top:2px">{{ t_sarcopenia_desc }}</span></span>
+          <span style="width:23px;height:23px;border-radius:50%;border:{{ condSarcopeniaCheckBorder }};background:{{ condSarcopeniaCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ condSarcopenia }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+        </button>
+      </div>
+
+      <button onClick="{{ toggleNone }}" style="display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:16px;background:{{ noneBg }};border:1px solid {{ noneBorder }};cursor:pointer;margin-top:16px">
+        <span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:700;color:#fff">{{ t_none_title }}</span><span style="display:block;font-size:12px;color:rgba(255,255,255,.6);font-weight:500;margin-top:2px">{{ t_none_desc }}</span></span>
+        <span style="width:23px;height:23px;border-radius:50%;border:{{ noneCheckBorder }};background:{{ noneCheckBg }};flex-shrink:0;display:flex;align-items:center;justify-content:center"><sc-if value="{{ condNone }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+      </button>
+    </sc-if>
+
+    <!-- Step 4 — Dietary preference -->
+    <sc-if value="{{ isStep4 }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:170px;font-size:28px;font-weight:700;line-height:1.16;font-family:ui-serif,Georgia,serif">{{ t_step4_heading }}</div>
+      <div style="font-size:14.5px;line-height:1.5;color:rgba(255,255,255,.72);font-weight:500;margin-top:10px">{{ t_step4_subtitle }}</div>
+
+      <div style="font-size:11.5px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:1px;margin-top:24px;margin-bottom:10px">{{ t_diet_question }}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button onClick="{{ setDietMeat }}" style="position:relative;height:88px;border-radius:16px;border:1px solid {{ dietMeatBorder }};cursor:pointer;font-size:13.5px;font-weight:700;background:{{ dietMeatBg }};color:{{ dietMeatColor }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;box-shadow:{{ dietMeatShadow }}">
+          <span style="position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;border:{{ dietMeatCheckBorder }};background:{{ dietMeatCheckBg }};display:flex;align-items:center;justify-content:center"><sc-if value="{{ isDietMeat }}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 3v8M11 3v8M7 7h4M11 11c0 3-2 4-2 8M17 3v18M17 3c-2 0-3 1.5-3 4s1 4 3 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>{{ t_diet_meat }}</button>
+        <button onClick="{{ setDietFish }}" style="position:relative;height:88px;border-radius:16px;border:1px solid {{ dietFishBorder }};cursor:pointer;font-size:13.5px;font-weight:700;background:{{ dietFishBg }};color:{{ dietFishColor }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;box-shadow:{{ dietFishShadow }}">
+          <span style="position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;border:{{ dietFishCheckBorder }};background:{{ dietFishCheckBg }};display:flex;align-items:center;justify-content:center"><sc-if value="{{ isDietFish }}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M2 12s4-5 10-5 10 5 10 5-4 5-10 5-10-5-10-5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="16" cy="11" r=".8" fill="currentColor"/></svg>{{ t_diet_fish }}</button>
+        <button onClick="{{ setDietEverything }}" style="position:relative;height:88px;border-radius:16px;border:1px solid {{ dietEverythingBorder }};cursor:pointer;font-size:13.5px;font-weight:700;background:{{ dietEverythingBg }};color:{{ dietEverythingColor }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;box-shadow:{{ dietEverythingShadow }}">
+          <span style="position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;border:{{ dietEverythingCheckBorder }};background:{{ dietEverythingCheckBg }};display:flex;align-items:center;justify-content:center"><sc-if value="{{ isDietEverything }}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>{{ t_diet_everything }}</button>
+        <button onClick="{{ setDietVegetarian }}" style="position:relative;height:88px;border-radius:16px;border:1px solid {{ dietVegetarianBorder }};cursor:pointer;font-size:13.5px;font-weight:700;background:{{ dietVegetarianBg }};color:{{ dietVegetarianColor }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;box-shadow:{{ dietVegetarianShadow }}">
+          <span style="position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;border:{{ dietVegetarianCheckBorder }};background:{{ dietVegetarianCheckBg }};display:flex;align-items:center;justify-content:center"><sc-if value="{{ isDietVegetarian }}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.35-9.5-9C.9 8.3 2.6 5 6 5c2 0 3.5 1.2 4 2.2C10.5 6.2 12 5 14 5c3.4 0 5.1 3.3 3.5 7-2.5 4.65-9.5 9-9.5 9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>{{ t_diet_vegetarian }}</button>
+        <button onClick="{{ setDietVegan }}" style="position:relative;grid-column:1 / -1;height:60px;border-radius:16px;border:1px solid {{ dietVeganBorder }};cursor:pointer;font-size:13.5px;font-weight:700;background:{{ dietVeganBg }};color:{{ dietVeganColor }};display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;box-shadow:{{ dietVeganShadow }}">
+          <span style="position:absolute;top:8px;right:12px;width:20px;height:20px;border-radius:50%;border:{{ dietVeganCheckBorder }};background:{{ dietVeganCheckBg }};display:flex;align-items:center;justify-content:center"><sc-if value="{{ isDietVegan }}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 20c8 0 11-6 11-13-6 0-9 2-10 7M7 20c-2-3-2-7 0-10M7 20c0-4 1-7 3-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>{{ t_diet_vegan }}</button>
+      </div>
+      <div style="display:flex;justify-content:center;margin-top:24px">
+        <img src="assets/img/kindfare-badge.png" alt="KindFare" style="width:150px;height:50px;object-fit:contain;filter:drop-shadow(0 1px 10px rgba(0,0,0,.5))"/>
+      </div>
+    </sc-if>
+
+    <!-- Step 5 — Review -->
+    <sc-if value="{{ isStep5 }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:170px;font-size:26px;font-weight:700;line-height:1.16;font-family:ui-serif,Georgia,serif">{{ t_step5_heading }} <span style="color:#4F7A63">✓</span></div>
+      <div style="font-size:14.5px;line-height:1.5;color:rgba(255,255,255,.75);font-weight:500;margin-top:10px">{{ t_step5_subtitle }}</div>
+
+      <div style="margin-top:22px;border-radius:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(10px);overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.12)"><span style="font-size:14px;color:rgba(255,255,255,.65);font-weight:500">{{ t_review_name }}</span><span style="font-size:14.5px;font-weight:700">{{ name }}</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.12)"><span style="font-size:14px;color:rgba(255,255,255,.65);font-weight:500">{{ t_review_age }}</span><span style="font-size:14.5px;font-weight:700">{{ age }} {{ t_years_suffix }}</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.12)"><span style="font-size:14px;color:rgba(255,255,255,.65);font-weight:500">{{ t_review_sex }}</span><span style="font-size:14.5px;font-weight:700">{{ sexLabel }}</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.12)"><span style="font-size:14px;color:rgba(255,255,255,.65);font-weight:500">{{ t_review_weight }}</span><span style="font-size:14.5px;font-weight:700">{{ weight }} {{ unitsLabel }}</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.12)"><span style="font-size:14px;color:rgba(255,255,255,.65);font-weight:500">{{ t_review_diet }}</span><span style="font-size:14.5px;font-weight:700">{{ dietLabel }}</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px"><span style="font-size:14px;color:rgba(255,255,255,.65);font-weight:500">{{ t_review_goal }}</span><span style="font-size:14.5px;font-weight:700">1,400 kcal/day</span></div>
+      </div>
+
+      <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.5px;margin-top:22px;margin-bottom:8px">{{ t_selected_conditions }}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-if value="{{ hasNoConditions }}" hint-placeholder-val="{{ true }}">
+          <span style="font-size:13px;font-weight:600;color:rgba(255,255,255,.6);background:rgba(255,255,255,.1);padding:7px 13px;border-radius:999px">{{ t_none_selected }}</span>
+        </sc-if>
+        <sc-if value="{{ condCfs }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:600;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.14)">{{ t_chip_cfs }}</span></sc-if>
+        <sc-if value="{{ condFibro }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:600;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.14)">{{ t_chip_fibro }}</span></sc-if>
+        <sc-if value="{{ condDepression }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:600;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.14)">{{ t_chip_depression }}</span></sc-if>
+        <sc-if value="{{ condAnxiety }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:600;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.14)">{{ t_chip_anxiety }}</span></sc-if>
+        <sc-if value="{{ condInsomnia }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:600;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.14)">{{ t_chip_insomnia }}</span></sc-if>
+        <sc-if value="{{ condLactose }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:600;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.14)">{{ t_chip_lactose }}</span></sc-if>
+        <sc-if value="{{ condGluten }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:600;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.14)">{{ t_chip_gluten }}</span></sc-if>
+        <sc-if value="{{ condObesity }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:600;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.14)">{{ t_chip_obesity }}</span></sc-if>
+        <sc-if value="{{ condOsteoarthritis }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:600;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.14)">{{ t_chip_oa }}</span></sc-if>
+        <sc-if value="{{ condBackPain }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:600;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.14)">{{ t_chip_backpain }}</span></sc-if>
+        <sc-if value="{{ condOsteopenia }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:600;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.14)">{{ t_chip_osteopenia }}</span></sc-if>
+        <sc-if value="{{ condOsteoporosis }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:600;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.14)">{{ t_chip_osteoporosis }}</span></sc-if>
+        <sc-if value="{{ condSarcopenia }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:600;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.14)">{{ t_chip_sarcopenia }}</span></sc-if>
+      </div>
+    </sc-if>
+
+    <!-- Step 6 — Processing -->
+    <sc-if value="{{ isStep6 }}" hint-placeholder-val="{{ false }}">
+      <div style="text-align:center;padding-top:120px">
+        <span style="display:inline-flex;width:72px;height:72px;border-radius:22px;background:#fff;align-items:center;justify-content:center;box-shadow:0 14px 30px rgba(30,28,24,.12)">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M4 12h4l2-7 4 14 2-7h4" stroke="#d98816" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <div style="font-size:21px;font-weight:700;color:#fff;margin-top:20px;font-family:ui-serif,Georgia,serif">{{ t_step6_heading }}</div>
+        <div style="height:4px;border-radius:999px;background:rgba(255,255,255,.2);margin:16px auto 0;width:220px;overflow:hidden"><div style="height:100%;border-radius:999px;background:linear-gradient(90deg,#d98816,#4A6B8A);width:{{ processingPct }};transition:width .4s"></div></div>
+
+        <div style="margin-top:28px;text-align:left;display:flex;flex-direction:column;gap:16px;max-width:280px;margin-left:auto;margin-right:auto">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="width:26px;height:26px;border-radius:50%;background:{{ proc1Bg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><sc-if value="{{ proc1Done }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+            <span style="font-size:14.5px;font-weight:700;color:{{ proc1Color }}">{{ t_proc1 }}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="width:26px;height:26px;border-radius:50%;background:{{ proc2Bg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><sc-if value="{{ proc2Done }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+            <span style="font-size:14.5px;font-weight:700;color:{{ proc2Color }}">{{ t_proc2 }}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="width:26px;height:26px;border-radius:50%;background:{{ proc3Bg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><sc-if value="{{ proc3Done }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+            <span style="font-size:14.5px;font-weight:700;color:{{ proc3Color }}">{{ t_proc3 }}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="width:26px;height:26px;border-radius:50%;background:{{ proc4Bg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><sc-if value="{{ proc4Done }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if></span>
+            <span style="font-size:13.5px;font-weight:600;color:{{ proc4Color }}">{{ t_proc4 }}</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- Step 7 — Completion -->
+    <sc-if value="{{ isStep7 }}" hint-placeholder-val="{{ false }}">
+      <div style="text-align:center;padding-top:30px">
+        <span style="position:relative;display:inline-flex;width:76px;height:76px;border-radius:50%;background:conic-gradient(from 0deg,#4A6B8A,#4F7A63,#d98816,#4A6B8A);align-items:center;justify-content:center;box-shadow:0 12px 28px rgba(0,0,0,.4)">
+          <span style="width:66px;height:66px;border-radius:50%;background:#141416;display:flex;align-items:center;justify-content:center">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#4A6B8A" stroke-width="2.2" stroke-linecap="round"/></svg>
+          </span>
+        </span>
+        <div style="font-size:27px;font-weight:700;color:#fff;margin-top:22px;font-family:ui-serif,Georgia,serif">{{ t_step7_heading }}</div>
+        <div style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;background:rgba(255,255,255,.14);padding:6px 13px;border-radius:999px">
+          <span style="width:6px;height:6px;border-radius:50%;background:#7fa88f"></span>
+          <span style="font-size:13px;color:#fff;font-weight:700">{{ t_mia_intro }}</span>
+        </div>
+
+        <div style="margin-top:24px;text-align:left;border-radius:22px;background:rgba(255,255,255,.1);backdrop-filter:blur(20px) saturate(160%);border:1px solid rgba(255,255,255,.18);box-shadow:0 18px 36px rgba(0,0,0,.3);padding:20px 22px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.16)">
+            <span style="font-size:13.5px;color:rgba(255,255,255,.7);font-weight:600">{{ t_daily_target }}</span>
+            <span style="font-size:22px;font-weight:800;font-family:ui-rounded,'SF Pro Rounded',sans-serif;color:#fff">1,400 <span style="font-size:13px;color:rgba(255,255,255,.7);font-weight:600">kcal/day</span></span>
+          </div>
+          <div style="padding-top:16px;display:flex;align-items:center;gap:12px">
+            <span style="width:36px;height:36px;border-radius:11px;background:rgba(79,122,99,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="3" stroke="#7fc4a0" stroke-width="1.8"/><path d="M12 8v9" stroke="#7fc4a0" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+            <div><div style="font-size:12.5px;color:rgba(255,255,255,.7);font-weight:600">{{ t_first_up_today }}</div><div style="font-size:15px;font-weight:800;color:#fff;margin-top:2px">{{ t_exercise_name }}</div></div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+
+  <!-- footer CTA -->
+  <div style="position:absolute;z-index:2;left:0;right:0;bottom:0;padding:14px 24px 28px;background:{{ footerBg }}">
+    <sc-if value="{{ showPrimaryBtn }}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{ onPrimary }}" style="width:100%;height:56px;border-radius:16px;background:linear-gradient(135deg,#4A6B8A,#3d5c7c);color:#fff;border:none;font-size:15.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 12px 26px rgba(74,107,138,.4)">
+        {{ primaryLabel }}<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </sc-if>
+    <sc-if value="{{ isStep7 }}" hint-placeholder-val="{{ false }}">
+      <a href="KindFare Home Redesign.dc.html" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:54px;border-radius:16px;background:#4A6B8A;color:#fff;text-decoration:none;font-size:15.5px;font-weight:700;box-sizing:border-box">
+        {{ t_start_kindfare }}<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </sc-if>
+  </div>
+
+
+    <sc-if value="{{ langPickerOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;z-index:100;background:{{ outerBg }}">
+        <div style="position:absolute;inset:0;z-index:1;overflow-y:auto;box-sizing:border-box;padding:54px 20px 40px">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px">
+            <button aria-label="Back" onClick="{{ toggleLangPicker }}" style="width:36px;height:36px;border-radius:50%;background:{{ glassBg }};border:1px solid {{ hairline }};display:flex;align-items:center;justify-content:center;cursor:pointer;color:{{ textPrimary }};flex-shrink:0">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <h1 style="font-size:22px;font-weight:700;letter-spacing:-.3px;font-family:ui-serif,Georgia,serif;margin:0;color:{{ textPrimary }}">{{ t_choose_language }}</h1>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <button onClick="{{ pickLangEn }}" style="width:100%;text-align:left;padding:17px 18px;border-radius:16px;border:1px solid {{ hairline }};background:{{ langEnBg }};color:{{ textPrimary }};font-size:15.5px;font-weight:600;cursor:pointer">English</button>
+            <button onClick="{{ pickLangPt }}" style="width:100%;text-align:left;padding:17px 18px;border-radius:16px;border:1px solid {{ hairline }};background:{{ langPtBg }};color:{{ textPrimary }};font-size:15.5px;font-weight:600;cursor:pointer">Português</button>
+            <button onClick="{{ pickLangHi }}" style="width:100%;text-align:left;padding:17px 18px;border-radius:16px;border:1px solid {{ hairline }};background:{{ langHiBg }};color:{{ textPrimary }};font-size:15.5px;font-weight:600;cursor:pointer;font-family:'Noto Sans Devanagari','Inter',sans-serif">हिन्दी</button>
+            <button onClick="{{ pickLangEs }}" style="width:100%;text-align:left;padding:17px 18px;border-radius:16px;border:1px solid {{ hairline }};background:{{ langEsBg }};color:{{ textPrimary }};font-size:15.5px;font-weight:600;cursor:pointer">Español</button>
+            <button onClick="{{ pickLangFr }}" style="width:100%;text-align:left;padding:17px 18px;border-radius:16px;border:1px solid {{ hairline }};background:{{ langFrBg }};color:{{ textPrimary }};font-size:15.5px;font-weight:600;cursor:pointer">Français</button>
+            <button onClick="{{ pickLangUr }}" style="width:100%;text-align:left;padding:17px 18px;border-radius:16px;border:1px solid {{ hairline }};background:{{ langUrBg }};color:{{ textPrimary }};font-size:15.5px;font-weight:600;cursor:pointer;font-family:'Noto Nastaliq Urdu','Inter',sans-serif">اردو</button>
+          </div>
+
+          <button onClick="{{ confirmLangPicker }}" style="width:100%;margin-top:18px;padding:16px;border-radius:16px;border:none;background:#4A6B8A;color:#fff;font-size:15.5px;font-weight:700;cursor:pointer;box-shadow:0 10px 22px rgba(74,107,138,.28)">{{ t_done }}</button>
+
+          <!-- rotating globe — decorative, animation only, purely on the language picker page -->
+          <div style="display:flex;justify-content:center;margin-top:32px;perspective:600px">
+            <div style="width:46px;height:46px;animation:kf-globe-spin 5s linear infinite;transform-style:preserve-3d">
+              <svg width="46" height="46" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="#4A6B8A" stroke-width="1.4"/>
+                <ellipse cx="12" cy="12" rx="3.6" ry="9" stroke="#4A6B8A" stroke-width="1.2"/>
+                <ellipse cx="12" cy="12" rx="7.2" ry="9" stroke="#4A6B8A" stroke-width="1.2"/>
+                <path d="M3 12h18" stroke="#4A6B8A" stroke-width="1.2"/>
+                <path d="M4.5 7.5h15" stroke="#4A6B8A" stroke-width="1"/>
+                <path d="M4.5 16.5h15" stroke="#4A6B8A" stroke-width="1"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    step: (() => { const m = /step(\d)/.exec(window.location.hash); return m ? Math.min(5, parseInt(m[1], 10)) : 0; })(),
+    name: (() => { try { const n = localStorage.getItem('kf_name'); return (n && n.trim()) ? n : 'Dana'; } catch (e) { return 'Dana'; } })(),
+    age: 53, weight: 60, sex: 'female', units: 'kg', diet: 'everything',
+    proc1Done: false, proc2Done: false, proc3Done: false, proc4Done: false,
+    condCfs: false, condFibro: false, condDepression: false, condAnxiety: false, condInsomnia: false,
+    condLactose: false, condGluten: false, condObesity: false,
+    condOsteoarthritis: false, condBackPain: false, condOsteopenia: false, condOsteoporosis: false, condSarcopenia: false,
+    condNone: false,
+    lang: (window.KindFareI18n ? KindFareI18n.getLang() : 'en'), langPickerOpen: false, pendingLang: null,
+  };
+
+  componentDidMount() {
+    // Some renderers don't reliably translate the `muted` HTML attribute into the
+    // video element's actual `.muted` property on first mount — if that happens,
+    // browsers silently block autoplay (NotAllowedError) and the background never
+    // starts. Force it explicitly so the loop always starts regardless.
+    const v = document.getElementById('kfOnboardingBgVideo');
+    if (v) {
+      v.muted = true;
+      v.play().catch(() => {});
+    }
+  }
+
+  go(step) {
+    if (window.KindFareSound) window.KindFareSound.tabSwitch();
+    this.setState({ step });
+  }
+  goBack() { if (this.state.step > 0) this.go(this.state.step - 1); }
+  runProcessing() {
+    if (window.KindFareSound) window.KindFareSound.streak();
+    this.setState({ step: 6, proc1Done: false, proc2Done: false, proc3Done: false, proc4Done: false });
+    const tap = () => { if (window.KindFareSound) window.KindFareSound.tap(); };
+    setTimeout(() => { tap(); this.setState({ proc1Done: true }); }, 500);
+    setTimeout(() => { tap(); this.setState({ proc2Done: true }); }, 1300);
+    setTimeout(() => { tap(); this.setState({ proc3Done: true }); }, 2100);
+    setTimeout(() => { if (window.KindFareSound) window.KindFareSound.success(); this.setState({ proc4Done: true }); }, 2900);
+    setTimeout(() => { this.setState({ step: 7 }); }, 3800);
+  }
+  goNext() {
+    if (this.state.step === 5) { this.runProcessing(); return; }
+    this.go(Math.min(7, this.state.step + 1));
+  }
+  skip() { this.runProcessing(); }
+
+  renderVals() {
+    const s = this.state;
+    const lang = s.lang;
+    // Mid-flow language re-selection (steps 1-5, opened via the header globe icon) now stages a
+    // choice and requires the Done button to apply it, matching Step 0's deliberate confirm-style
+    // flow instead of applying instantly on tap. Step 0's own inline chip list is unaffected — it
+    // keeps applying immediately, since the chip's own "confirmed" highlight already IS its confirm
+    // step there.
+    const selLang = s.pendingLang ?? lang;
+    const t = (key) => window.KindFareI18n ? KindFareI18n.t(key, lang) : key;
+    const langSeg = (active) => active ? { bg: 'rgba(74,107,138,.14)' } : { bg: 'transparent' };
+    const seg = (active) => active
+      ? { bg: '#fff', color: '#1E1C18', shadow: '0 3px 8px rgba(0,0,0,.25)' }
+      : { bg: 'transparent', color: 'rgba(255,255,255,.75)', shadow: 'none' };
+    const sexM = seg(s.sex === 'male'), sexF = seg(s.sex === 'female'), sexO = seg(s.sex === 'other');
+    const unitsKg = seg(s.units === 'kg'), unitsLb = seg(s.units === 'lb');
+    // Pixel-matched to chip()'s exact border/shadow values (not just the same hue) plus a
+    // corner check badge, so Step 4's "confirmed" feedback is the same effect as Step 3's,
+    // not just a similarly-colored border — tile size/layout unchanged per explicit request.
+    const dietCard = (active) => active
+      ? { bg: 'rgba(217,136,22,.16)', color: '#fff', border: 'rgba(217,136,22,.35)', shadow: '0 8px 18px rgba(217,136,22,.18)', checkBg: '#d98816', checkBorder: 'none' }
+      : { bg: 'rgba(255,255,255,.06)', color: 'rgba(255,255,255,.8)', border: 'rgba(255,255,255,.14)', shadow: 'none', checkBg: 'transparent', checkBorder: '1.5px solid rgba(255,255,255,.35)' };
+    const dietMeat = dietCard(s.diet === 'meat'), dietFish = dietCard(s.diet === 'fish'),
+      dietEverything = dietCard(s.diet === 'everything'), dietVegetarian = dietCard(s.diet === 'vegetarian'),
+      dietVegan = dietCard(s.diet === 'vegan');
+    const dotBg = (n) => s.step >= n ? '#fff' : 'rgba(255,255,255,.28)';
+    const chip = (on) => on
+      ? { bg: 'rgba(217,136,22,.16)', border: 'rgba(217,136,22,.35)', accent: '#d98816', checkBg: '#d98816', checkBorder: 'none', shadow: '0 8px 18px rgba(217,136,22,.18)' }
+      : { bg: 'rgba(255,255,255,.06)', border: 'rgba(255,255,255,.12)', accent: 'transparent', checkBg: 'transparent', checkBorder: '1.5px solid rgba(255,255,255,.35)', shadow: 'none' };
+    const cfs = chip(s.condCfs), fibro = chip(s.condFibro), dep = chip(s.condDepression), anx = chip(s.condAnxiety), ins = chip(s.condInsomnia);
+    const lactose = chip(s.condLactose), gluten = chip(s.condGluten), obesity = chip(s.condObesity);
+    const oa = chip(s.condOsteoarthritis), backPain = chip(s.condBackPain), openia = chip(s.condOsteopenia), oporosis = chip(s.condOsteoporosis), sarco = chip(s.condSarcopenia);
+    const noneSel = { bg: s.condNone ? 'rgba(255,255,255,.16)' : 'rgba(255,255,255,.06)', border: s.condNone ? 'rgba(255,255,255,.4)' : 'rgba(255,255,255,.12)', checkBg: s.condNone ? '#fff' : 'transparent', checkBorder: s.condNone ? 'none' : '1.5px solid rgba(255,255,255,.35)' };
+    const anyCondSelected = s.condCfs || s.condFibro || s.condDepression || s.condAnxiety || s.condInsomnia ||
+      s.condLactose || s.condGluten || s.condObesity || s.condOsteoarthritis || s.condBackPain || s.condOsteopenia || s.condOsteoporosis || s.condSarcopenia;
+    const toggleCond = (key) => { tap(); this.setState(st => ({ [key]: !st[key], condNone: false })); };
+    const dietLabels = { meat: t('ob.diet_label_meat'), fish: t('ob.diet_label_fish'), everything: t('ob.diet_label_everything'), vegetarian: t('ob.diet_label_vegetarian'), vegan: t('ob.diet_label_vegan') };
+    const tap = () => { if (window.KindFareSound) window.KindFareSound.tap(); };
+    const stepNames = [t('ob.stepname_1'), t('ob.stepname_2'), t('ob.stepname_3'), t('ob.stepname_4'), t('ob.stepname_5')];
+    // Language chips for the new Step 0 (language is now the first thing onboarding asks, styled
+    // to match the rest of the flow's dark glass-card look, instead of only being reachable via
+    // the light-theme full-page picker from the globe icon). Tapping a language applies it
+    // immediately (translates the rest of onboarding right away, same as everywhere else in the
+    // app) but does NOT auto-advance — the user still taps Continue, which doubles as the confirm
+    // step that was flagged as missing earlier.
+    // Reuses chip() directly (the exact same helper Step 3's condition rows use) rather than a
+    // separate near-duplicate, so Step 0's rows are pixel-identical to Step 3's, not just similar —
+    // per explicit user request to match "exactly".
+    const obLangEn = chip(lang === 'en'), obLangPt = chip(lang === 'pt'), obLangHi = chip(lang === 'hi'),
+      obLangEs = chip(lang === 'es'), obLangFr = chip(lang === 'fr'), obLangUr = chip(lang === 'ur');
+
+    return {
+      isStep0: s.step === 0,
+      isStep1: s.step === 1, isStep2: s.step === 2, isStep3: s.step === 3,
+      isStep4: s.step === 4, isStep5: s.step === 5, isStep6: s.step === 6, isStep7: s.step === 7,
+      // video background + dark glass styling now runs the whole way through, including the
+      // processing/completion screens — kept consistent with steps 1-5 rather than switching to
+      // a light theme at the end.
+      showVideo: true,
+      showTopbar: s.step <= 5,
+      statusColor: '#fff',
+      bodyInset: s.step <= 5 ? '90px 0 90px 0' : '47px 0 90px 0',
+      footerBg: 'linear-gradient(to top,rgba(8,8,10,.85) 60%,transparent)',
+      backDisabled: s.step === 0, backOpacity: s.step === 0 ? 0.35 : 1,
+      goBack: () => this.goBack(), skip: () => this.skip(),
+      onPrimary: () => this.goNext(),
+      showPrimaryBtn: s.step <= 5,
+      primaryLabel: s.step === 5 ? t('ob.see_plan') : t('ob.continue'),
+      obLangEnBg: obLangEn.bg, obLangEnBorder: obLangEn.border, obLangEnAccent: obLangEn.accent, obLangEnShadow: obLangEn.shadow, obLangEnCheckBg: obLangEn.checkBg, obLangEnCheckBorder: obLangEn.checkBorder, isLangEn: lang === 'en',
+      obLangPtBg: obLangPt.bg, obLangPtBorder: obLangPt.border, obLangPtAccent: obLangPt.accent, obLangPtShadow: obLangPt.shadow, obLangPtCheckBg: obLangPt.checkBg, obLangPtCheckBorder: obLangPt.checkBorder, isLangPt: lang === 'pt',
+      obLangHiBg: obLangHi.bg, obLangHiBorder: obLangHi.border, obLangHiAccent: obLangHi.accent, obLangHiShadow: obLangHi.shadow, obLangHiCheckBg: obLangHi.checkBg, obLangHiCheckBorder: obLangHi.checkBorder, isLangHi: lang === 'hi',
+      obLangEsBg: obLangEs.bg, obLangEsBorder: obLangEs.border, obLangEsAccent: obLangEs.accent, obLangEsShadow: obLangEs.shadow, obLangEsCheckBg: obLangEs.checkBg, obLangEsCheckBorder: obLangEs.checkBorder, isLangEs: lang === 'es',
+      obLangFrBg: obLangFr.bg, obLangFrBorder: obLangFr.border, obLangFrAccent: obLangFr.accent, obLangFrShadow: obLangFr.shadow, obLangFrCheckBg: obLangFr.checkBg, obLangFrCheckBorder: obLangFr.checkBorder, isLangFr: lang === 'fr',
+      obLangUrBg: obLangUr.bg, obLangUrBorder: obLangUr.border, obLangUrAccent: obLangUr.accent, obLangUrShadow: obLangUr.shadow, obLangUrCheckBg: obLangUr.checkBg, obLangUrCheckBorder: obLangUr.checkBorder, isLangUr: lang === 'ur',
+      lang,
+      langPickerOpen: s.langPickerOpen,
+      // Onboarding has no light/dark toggle (it runs a dark hero/video background throughout by
+      // design), so unlike the other 9 screens it never defined outerBg/glassBg/hairline/
+      // textPrimary. The language-picker overlay below reuses the shared light-mode "Clinical
+      // Calm" values directly here (not derived from any toggle) so it renders as an opaque page
+      // instead of resolving those tokens to nothing and appearing transparent over the hero.
+      outerBg: 'radial-gradient(at 15% 8%,#F1F1EA 0,transparent 55%),radial-gradient(at 85% 5%,#EFEFE7 0,transparent 50%),radial-gradient(at 90% 85%,#EEF0E9 0,transparent 55%),radial-gradient(at 10% 90%,#F5F2EA 0,transparent 50%),#F5F2EA',
+      textPrimary: '#1E1C18',
+      hairline: 'rgba(30,28,24,.08)',
+      glassBg: 'rgba(255,255,255,.72)',
+      toggleLangPicker: () => { tap(); this.setState(st => ({ langPickerOpen: !st.langPickerOpen, pendingLang: null })); },
+      setLangEn: () => { if (window.KindFareI18n) KindFareI18n.setLang('en'); tap(); this.setState({ lang: 'en', langPickerOpen: false }); },
+      setLangPt: () => { if (window.KindFareI18n) KindFareI18n.setLang('pt'); tap(); this.setState({ lang: 'pt', langPickerOpen: false }); },
+      setLangHi: () => { if (window.KindFareI18n) KindFareI18n.setLang('hi'); tap(); this.setState({ lang: 'hi', langPickerOpen: false }); },
+      setLangEs: () => { if (window.KindFareI18n) KindFareI18n.setLang('es'); tap(); this.setState({ lang: 'es', langPickerOpen: false }); },
+      setLangFr: () => { if (window.KindFareI18n) KindFareI18n.setLang('fr'); tap(); this.setState({ lang: 'fr', langPickerOpen: false }); },
+      setLangUr: () => { if (window.KindFareI18n) KindFareI18n.setLang('ur'); tap(); this.setState({ lang: 'ur', langPickerOpen: false }); },
+      pickLangEn: () => { tap(); this.setState({ pendingLang: 'en' }); },
+      pickLangPt: () => { tap(); this.setState({ pendingLang: 'pt' }); },
+      pickLangHi: () => { tap(); this.setState({ pendingLang: 'hi' }); },
+      pickLangEs: () => { tap(); this.setState({ pendingLang: 'es' }); },
+      pickLangFr: () => { tap(); this.setState({ pendingLang: 'fr' }); },
+      pickLangUr: () => { tap(); this.setState({ pendingLang: 'ur' }); },
+      confirmLangPicker: () => { const nl = s.pendingLang || lang; if (window.KindFareI18n) KindFareI18n.setLang(nl); if (window.KindFareSound) window.KindFareSound.success(); this.setState({ lang: nl, langPickerOpen: false, pendingLang: null }); },
+      langEnBg: langSeg(selLang === 'en').bg,
+      langPtBg: langSeg(selLang === 'pt').bg,
+      langHiBg: langSeg(selLang === 'hi').bg,
+      langEsBg: langSeg(selLang === 'es').bg,
+      langFrBg: langSeg(selLang === 'fr').bg,
+      langUrBg: langSeg(selLang === 'ur').bg,
+      t_language_aria: t('common.language_aria'),
+      t_choose_language: t('common.choose_language'),
+      t_done: t('common.done'),
+      t_back: t('common.back'),
+      t_skip: t('ob.skip'),
+      t_step1_heading: t('ob.step1_heading'),
+      t_step1_subtitle: t('ob.step1_subtitle'),
+      t_step1_label: t('ob.step1_label'),
+      t_step1_placeholder: t('ob.step1_placeholder'),
+      t_step2_heading: t('ob.step2_heading'),
+      t_step2_subtitle: t('ob.step2_subtitle'),
+      t_age_label: t('ob.age_label'),
+      t_weight_label: t('ob.weight_label'),
+      t_sex_label: t('ob.sex_label'),
+      t_units_label: t('ob.units_label'),
+      t_male: t('ob.male'), t_female: t('ob.female'), t_other: t('ob.other'),
+      t_step3_heading: t('ob.step3_heading'),
+      t_step3_subtitle: t('ob.step3_subtitle'),
+      t_section_energy: t('ob.section_energy'),
+      t_section_diet_weight: t('ob.section_diet_weight'),
+      t_section_joints: t('ob.section_joints'),
+      t_cfs_title: t('ob.cfs_title'), t_cfs_desc: t('ob.cfs_desc'),
+      t_fibro_title: t('ob.fibro_title'), t_fibro_desc: t('ob.fibro_desc'),
+      t_depression_title: t('ob.depression_title'), t_depression_desc: t('ob.depression_desc'),
+      t_anxiety_title: t('ob.anxiety_title'), t_anxiety_desc: t('ob.anxiety_desc'),
+      t_insomnia_title: t('ob.insomnia_title'), t_insomnia_desc: t('ob.insomnia_desc'),
+      t_lactose_title: t('ob.lactose_title'), t_lactose_desc: t('ob.lactose_desc'),
+      t_gluten_title: t('ob.gluten_title'), t_gluten_desc: t('ob.gluten_desc'),
+      t_obesity_title: t('ob.obesity_title'), t_obesity_desc: t('ob.obesity_desc'),
+      t_oa_title: t('ob.oa_title'), t_oa_desc: t('ob.oa_desc'),
+      t_backpain_title: t('ob.backpain_title'), t_backpain_desc: t('ob.backpain_desc'),
+      t_osteopenia_title: t('ob.osteopenia_title'), t_osteopenia_desc: t('ob.osteopenia_desc'),
+      t_osteoporosis_title: t('ob.osteoporosis_title'), t_osteoporosis_desc: t('ob.osteoporosis_desc'),
+      t_sarcopenia_title: t('ob.sarcopenia_title'), t_sarcopenia_desc: t('ob.sarcopenia_desc'),
+      t_none_title: t('ob.none_title'), t_none_desc: t('ob.none_desc'),
+      t_step4_heading: t('ob.step4_heading'),
+      t_step4_subtitle: t('ob.step4_subtitle'),
+      t_diet_question: t('ob.diet_question'),
+      t_diet_meat: t('ob.diet_meat'), t_diet_fish: t('ob.diet_fish'), t_diet_everything: t('ob.diet_everything'),
+      t_diet_vegetarian: t('ob.diet_vegetarian'), t_diet_vegan: t('ob.diet_vegan'),
+      t_step5_heading: t('ob.step5_heading'),
+      t_step5_subtitle: t('ob.step5_subtitle'),
+      t_review_name: t('ob.review_name'), t_review_age: t('ob.review_age'), t_review_sex: t('ob.review_sex'),
+      t_review_weight: t('ob.review_weight'), t_review_diet: t('ob.review_diet'), t_review_goal: t('ob.review_goal'),
+      t_years_suffix: t('ob.years_suffix'),
+      t_selected_conditions: t('ob.selected_conditions'),
+      t_none_selected: t('ob.none_selected'),
+      t_chip_cfs: t('ob.chip_cfs'), t_chip_fibro: t('ob.chip_fibro'), t_chip_depression: t('ob.chip_depression'),
+      t_chip_anxiety: t('ob.chip_anxiety'), t_chip_insomnia: t('ob.chip_insomnia'), t_chip_lactose: t('ob.chip_lactose'),
+      t_chip_gluten: t('ob.chip_gluten'), t_chip_obesity: t('ob.chip_obesity'), t_chip_oa: t('ob.chip_oa'),
+      t_chip_backpain: t('ob.chip_backpain'), t_chip_osteopenia: t('ob.chip_osteopenia'), t_chip_osteoporosis: t('ob.chip_osteoporosis'),
+      t_chip_sarcopenia: t('ob.chip_sarcopenia'),
+      t_step6_heading: t('ob.step6_heading'),
+      t_proc1: t('ob.proc1'), t_proc2: t('ob.proc2'), t_proc3: t('ob.proc3'), t_proc4: t('ob.proc4'),
+      t_step7_heading: t('ob.step7_heading').replace('{name}', s.name),
+      t_mia_intro: t('ob.mia_intro'),
+      t_daily_target: t('ob.daily_target'),
+      t_first_up_today: t('ob.first_up_today'),
+      t_exercise_name: t('ob.exercise_name'),
+      t_start_kindfare: t('ob.start_kindfare'),
+      processingPct: (25 * ((s.proc1Done ? 1 : 0) + (s.proc2Done ? 1 : 0) + (s.proc3Done ? 1 : 0) + (s.proc4Done ? 1 : 0))) + '%',
+      proc1Done: s.proc1Done, proc2Done: s.proc2Done, proc3Done: s.proc3Done, proc4Done: s.proc4Done,
+      proc1Bg: s.proc1Done ? '#4A6B8A' : 'rgba(255,255,255,.16)', proc1Color: s.proc1Done ? '#fff' : 'rgba(255,255,255,.55)',
+      proc2Bg: s.proc2Done ? '#4A6B8A' : 'rgba(255,255,255,.16)', proc2Color: s.proc2Done ? '#fff' : 'rgba(255,255,255,.55)',
+      proc3Bg: s.proc3Done ? '#4A6B8A' : 'rgba(255,255,255,.16)', proc3Color: s.proc3Done ? '#fff' : 'rgba(255,255,255,.55)',
+      proc4Bg: s.proc4Done ? '#4A6B8A' : 'rgba(255,255,255,.16)', proc4Color: s.proc4Done ? '#fff' : 'rgba(255,255,255,.55)',
+      dot1: s.step > 1 ? '100%' : (s.step === 1 ? '20%' : '0%'),
+      dot2: s.step > 2 ? '100%' : (s.step === 2 ? '100%' : '0%'),
+      dot3: s.step > 3 ? '100%' : (s.step === 3 ? '100%' : '0%'),
+      dot4: s.step > 4 ? '100%' : (s.step === 4 ? '100%' : '0%'),
+      dot5: s.step >= 5 ? '100%' : '0%',
+      stepCounter: s.step === 0 ? t('common.choose_language') : (t('ob.step_of').replace('{n}', Math.min(s.step, 5)) + stepNames[Math.min(s.step, 5) - 1]),
+      name: s.name, onNameChange: (e) => { const v = e.target.value; try { localStorage.setItem('kf_name', v); } catch (err) {} this.setState({ name: v }); },
+      age: s.age,
+      ageUp: () => { tap(); this.setState(st => ({ age: Math.min(110, st.age + 1) })); },
+      ageDown: () => { tap(); this.setState(st => ({ age: Math.max(1, st.age - 1) })); },
+      weight: s.weight,
+      weightUp: () => { tap(); this.setState(st => ({ weight: st.weight + 1 })); },
+      weightDown: () => { tap(); this.setState(st => ({ weight: Math.max(1, st.weight - 1) })); },
+      setSexMale: () => { tap(); this.setState({ sex: 'male' }); },
+      setSexFemale: () => { tap(); this.setState({ sex: 'female' }); },
+      setSexOther: () => { tap(); this.setState({ sex: 'other' }); },
+      sexMaleBg: sexM.bg, sexMaleColor: sexM.color, sexMaleShadow: sexM.shadow,
+      sexFemaleBg: sexF.bg, sexFemaleColor: sexF.color, sexFemaleShadow: sexF.shadow,
+      sexOtherBg: sexO.bg, sexOtherColor: sexO.color, sexOtherShadow: sexO.shadow,
+      sexLabel: s.sex === 'male' ? t('ob.male') : (s.sex === 'female' ? t('ob.female') : t('ob.other')),
+      setUnitsKg: () => { tap(); this.setState({ units: 'kg' }); },
+      setUnitsLb: () => { tap(); this.setState({ units: 'lb' }); },
+      unitsKgBg: unitsKg.bg, unitsKgColor: unitsKg.color, unitsKgShadow: unitsKg.shadow,
+      unitsLbBg: unitsLb.bg, unitsLbColor: unitsLb.color, unitsLbShadow: unitsLb.shadow,
+      unitsLabel: s.units,
+      setDietMeat: () => { tap(); this.setState({ diet: 'meat' }); },
+      setDietFish: () => { tap(); this.setState({ diet: 'fish' }); },
+      setDietEverything: () => { tap(); this.setState({ diet: 'everything' }); },
+      setDietVegetarian: () => { tap(); this.setState({ diet: 'vegetarian' }); },
+      setDietVegan: () => { tap(); this.setState({ diet: 'vegan' }); },
+      dietMeatBg: dietMeat.bg, dietMeatColor: dietMeat.color, dietMeatBorder: dietMeat.border, dietMeatShadow: dietMeat.shadow, dietMeatCheckBg: dietMeat.checkBg, dietMeatCheckBorder: dietMeat.checkBorder, isDietMeat: s.diet === 'meat',
+      dietFishBg: dietFish.bg, dietFishColor: dietFish.color, dietFishBorder: dietFish.border, dietFishShadow: dietFish.shadow, dietFishCheckBg: dietFish.checkBg, dietFishCheckBorder: dietFish.checkBorder, isDietFish: s.diet === 'fish',
+      dietEverythingBg: dietEverything.bg, dietEverythingColor: dietEverything.color, dietEverythingBorder: dietEverything.border, dietEverythingShadow: dietEverything.shadow, dietEverythingCheckBg: dietEverything.checkBg, dietEverythingCheckBorder: dietEverything.checkBorder, isDietEverything: s.diet === 'everything',
+      dietVegetarianBg: dietVegetarian.bg, dietVegetarianColor: dietVegetarian.color, dietVegetarianBorder: dietVegetarian.border, dietVegetarianShadow: dietVegetarian.shadow, dietVegetarianCheckBg: dietVegetarian.checkBg, dietVegetarianCheckBorder: dietVegetarian.checkBorder, isDietVegetarian: s.diet === 'vegetarian',
+      dietVeganBg: dietVegan.bg, dietVeganColor: dietVegan.color, dietVeganBorder: dietVegan.border, dietVeganShadow: dietVegan.shadow, dietVeganCheckBg: dietVegan.checkBg, dietVeganCheckBorder: dietVegan.checkBorder, isDietVegan: s.diet === 'vegan',
+      dietLabel: dietLabels[s.diet],
+      toggleCondCfs: () => toggleCond('condCfs'),
+      toggleCondFibro: () => toggleCond('condFibro'),
+      toggleCondDepression: () => toggleCond('condDepression'),
+      toggleCondAnxiety: () => toggleCond('condAnxiety'),
+      toggleCondInsomnia: () => toggleCond('condInsomnia'),
+      toggleCondLactose: () => toggleCond('condLactose'),
+      toggleCondGluten: () => toggleCond('condGluten'),
+      toggleCondObesity: () => toggleCond('condObesity'),
+      toggleCondOsteoarthritis: () => toggleCond('condOsteoarthritis'),
+      toggleCondBackPain: () => toggleCond('condBackPain'),
+      toggleCondOsteopenia: () => toggleCond('condOsteopenia'),
+      toggleCondOsteoporosis: () => toggleCond('condOsteoporosis'),
+      toggleCondSarcopenia: () => toggleCond('condSarcopenia'),
+      toggleNone: () => { tap(); this.setState(st => ({
+        condNone: !st.condNone, condCfs: false, condFibro: false, condDepression: false, condAnxiety: false, condInsomnia: false,
+        condLactose: false, condGluten: false, condObesity: false, condOsteoarthritis: false, condBackPain: false, condOsteopenia: false, condOsteoporosis: false, condSarcopenia: false,
+      })); },
+      noneBg: noneSel.bg, noneBorder: noneSel.border, noneCheckBg: noneSel.checkBg, noneCheckBorder: noneSel.checkBorder,
+      condCfs: s.condCfs, condFibro: s.condFibro, condDepression: s.condDepression, condAnxiety: s.condAnxiety, condInsomnia: s.condInsomnia,
+      condLactose: s.condLactose, condGluten: s.condGluten, condObesity: s.condObesity,
+      condOsteoarthritis: s.condOsteoarthritis, condBackPain: s.condBackPain, condOsteopenia: s.condOsteopenia, condOsteoporosis: s.condOsteoporosis, condSarcopenia: s.condSarcopenia,
+      condNone: s.condNone,
+      hasNoConditions: !anyCondSelected,
+      condCfsBg: cfs.bg, condCfsBorder: cfs.border, condCfsAccent: cfs.accent, condCfsCheckBg: cfs.checkBg, condCfsCheckBorder: cfs.checkBorder, condCfsShadow: cfs.shadow,
+      condFibroBg: fibro.bg, condFibroBorder: fibro.border, condFibroAccent: fibro.accent, condFibroCheckBg: fibro.checkBg, condFibroCheckBorder: fibro.checkBorder, condFibroShadow: fibro.shadow,
+      condDepressionBg: dep.bg, condDepressionBorder: dep.border, condDepressionAccent: dep.accent, condDepressionCheckBg: dep.checkBg, condDepressionCheckBorder: dep.checkBorder, condDepressionShadow: dep.shadow,
+      condAnxietyBg: anx.bg, condAnxietyBorder: anx.border, condAnxietyAccent: anx.accent, condAnxietyCheckBg: anx.checkBg, condAnxietyCheckBorder: anx.checkBorder, condAnxietyShadow: anx.shadow,
+      condInsomniaBg: ins.bg, condInsomniaBorder: ins.border, condInsomniaAccent: ins.accent, condInsomniaCheckBg: ins.checkBg, condInsomniaCheckBorder: ins.checkBorder, condInsomniaShadow: ins.shadow,
+      condLactoseBg: lactose.bg, condLactoseBorder: lactose.border, condLactoseAccent: lactose.accent, condLactoseCheckBg: lactose.checkBg, condLactoseCheckBorder: lactose.checkBorder, condLactoseShadow: lactose.shadow,
+      condGlutenBg: gluten.bg, condGlutenBorder: gluten.border, condGlutenAccent: gluten.accent, condGlutenCheckBg: gluten.checkBg, condGlutenCheckBorder: gluten.checkBorder, condGlutenShadow: gluten.shadow,
+      condObesityBg: obesity.bg, condObesityBorder: obesity.border, condObesityAccent: obesity.accent, condObesityCheckBg: obesity.checkBg, condObesityCheckBorder: obesity.checkBorder, condObesityShadow: obesity.shadow,
+      condOsteoarthritisBg: oa.bg, condOsteoarthritisBorder: oa.border, condOsteoarthritisAccent: oa.accent, condOsteoarthritisCheckBg: oa.checkBg, condOsteoarthritisCheckBorder: oa.checkBorder, condOsteoarthritisShadow: oa.shadow,
+      condBackPainBg: backPain.bg, condBackPainBorder: backPain.border, condBackPainAccent: backPain.accent, condBackPainCheckBg: backPain.checkBg, condBackPainCheckBorder: backPain.checkBorder, condBackPainShadow: backPain.shadow,
+      condOsteopeniaBg: openia.bg, condOsteopeniaBorder: openia.border, condOsteopeniaAccent: openia.accent, condOsteopeniaCheckBg: openia.checkBg, condOsteopeniaCheckBorder: openia.checkBorder, condOsteopeniaShadow: openia.shadow,
+      condOsteoporosisBg: oporosis.bg, condOsteoporosisBorder: oporosis.border, condOsteoporosisAccent: oporosis.accent, condOsteoporosisCheckBg: oporosis.checkBg, condOsteoporosisCheckBorder: oporosis.checkBorder, condOsteoporosisShadow: oporosis.shadow,
+      condSarcopeniaBg: sarco.bg, condSarcopeniaBorder: sarco.border, condSarcopeniaAccent: sarco.accent, condSarcopeniaCheckBg: sarco.checkBg, condSarcopeniaCheckBorder: sarco.checkBorder, condSarcopeniaShadow: sarco.shadow,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

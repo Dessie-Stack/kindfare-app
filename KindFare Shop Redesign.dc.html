@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<script src="./kindfare-sound.js"></script>
+<script src="./kindfare-i18n.js"></script>
+<script src="./kindfare-openfoodfacts.js"></script>
+<style>
+  body{margin:0}
+  [style*="overflow-y:auto"]::-webkit-scrollbar{display:none}
+  [style*="overflow-y:auto"]{scrollbar-width:none}
+
+  a{color:#4A6B8A}
+  a:hover{color:#3a5670}
+  @keyframes kf-drift1{0%{transform:translate(0,0) scale(1)} 33%{transform:translate(55px,70px) scale(1.25)} 66%{transform:translate(-30px,40px) scale(0.88)} 100%{transform:translate(0,0) scale(1)}}
+  @keyframes kf-drift2{0%{transform:translate(0,0) scale(1)} 33%{transform:translate(-65px,45px) scale(1.2)} 66%{transform:translate(35px,-25px) scale(0.85)} 100%{transform:translate(0,0) scale(1)}}
+  @keyframes kf-drift3{0%{transform:translate(0,0) scale(1)} 33%{transform:translate(45px,-60px) scale(1.28)} 66%{transform:translate(-40px,25px) scale(0.82)} 100%{transform:translate(0,0) scale(1)}}
+  @media (prefers-reduced-motion: reduce){ [style*="kf-drift"]{animation:none !important} }
+
+  :focus-visible{outline:2px solid #4A6B8A;outline-offset:2px;border-radius:4px}
+  @keyframes kf-globe-spin{from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
+</style>
+</helmet>
+
+<div style="width:390px;height:844px;position:relative;background:{{ outerBg }};overflow:hidden;font-family:'Inter','Noto Sans Devanagari',-apple-system,BlinkMacSystemFont,sans-serif;color:{{ textPrimary }};box-shadow:0 30px 70px rgba(0,0,0,.25)">
+
+  <!-- animated blob mesh — same pattern as Home -->
+  <div style="position:absolute;inset:0;z-index:0;overflow:hidden">
+    <div style="position:absolute;width:260px;height:260px;top:-60px;left:-70px;border-radius:50%;filter:blur(50px);opacity:.85;background:radial-gradient(circle,#e8ecf0 0%,#BDC9D6 70%,transparent 100%);animation:kf-drift1 11s ease-in-out infinite"></div>
+    <div style="position:absolute;width:300px;height:300px;top:160px;right:-110px;border-radius:50%;filter:blur(50px);opacity:.85;background:radial-gradient(circle,#dde6d5 0%,#7fa06b 70%,transparent 100%);animation:kf-drift2 13s ease-in-out infinite"></div>
+    <div style="position:absolute;width:280px;height:280px;bottom:180px;left:-90px;border-radius:50%;filter:blur(50px);opacity:.85;background:radial-gradient(circle,#f0c674 0%,#d98816 70%,transparent 100%);animation:kf-drift3 10s ease-in-out infinite"></div>
+    <div style="position:absolute;width:220px;height:220px;bottom:-80px;right:-40px;border-radius:50%;filter:blur(50px);opacity:.85;background:radial-gradient(circle,#d7dde3 0%,#BDC9D6 70%,transparent 100%);animation:kf-drift1 9s ease-in-out infinite reverse"></div>
+  </div>
+
+  <div style="position:relative;z-index:1;height:47px;padding:0 26px;display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:8px;font-size:15px;font-weight:600;color:{{ textPrimary }}">
+    <span>9:41</span>
+    <span style="display:flex;gap:5px;align-items:center">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/><rect x="5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/><rect x="10" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="1" fill="currentColor" opacity=".4"/></svg>
+      <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="1" y="1" width="21" height="11" rx="3" stroke="currentColor" stroke-width="1"/><rect x="2.5" y="2.5" width="15" height="8" rx="1.5" fill="currentColor"/><rect x="23.5" y="4" width="1.6" height="5" rx="0.8" fill="currentColor"/></svg>
+    </span>
+  </div>
+
+  <div style="position:absolute;z-index:1;inset:47px 0 84px 0;overflow-y:auto;box-sizing:border-box;padding-bottom:24px">
+
+    <!-- header -->
+    <div style="padding:6px 20px 16px;position:relative">
+      <div style="position:absolute;top:6px;right:20px;display:flex;gap:8px">
+        <div style="position:relative">
+          <button aria-label="{{ t_change_language }}" onClick="{{ toggleLangPicker }}" style="width:32px;height:32px;border-radius:50%;background:{{ glassBg }};border:1px solid {{ hairline }};display:flex;align-items:center;justify-content:center;cursor:pointer;color:{{ textPrimary }}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.7"/><path d="M12 3c2.8 2.4 4.4 5.7 4.4 9s-1.6 6.6-4.4 9c-2.8-2.4-4.4-5.7-4.4-9s1.6-6.6 4.4-9z" stroke="currentColor" stroke-width="1.7"/></svg>
+          </button>
+        </div>
+        <button aria-label="{{ t_toggle_dark_mode }}" onClick="{{ toggleDark }}" style="width:32px;height:32px;border-radius:50%;background:{{ glassBg }};border:1px solid {{ hairline }};display:flex;align-items:center;justify-content:center;cursor:pointer;color:{{ textPrimary }}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div style="font-size:13px;color:{{ textSecondary }};font-weight:600">{{ t_based_on_plan }}</div>
+      <h1 style="font-size:26px;font-weight:700;letter-spacing:-.5px;margin-top:2px;font-family:ui-serif,Georgia,serif">{{ t_heading }}</h1>
+    </div>
+
+    <!-- toolbar -->
+    <div style="display:flex;align-items:center;gap:8px;padding:0 20px 10px">
+      <button onClick="{{ selectAll }}" style="padding:8px 16px;border-radius:999px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};font-size:13px;font-weight:700;color:#1E1C18;cursor:pointer">{{ t_select_all }}</button>
+      <button onClick="{{ clearAll }}" style="padding:8px 16px;border-radius:999px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};font-size:13px;font-weight:700;color:#1E1C18;cursor:pointer">{{ t_clear }}</button>
+      <span style="font-size:12px;color:{{ textSecondary }};font-weight:600;margin-left:auto">{{ dietBadgeLabel }}</span>
+    </div>
+
+    <!-- Add item — search by name or barcode via Open Food Facts. Results are unverified until reviewed. -->
+    <div style="padding:0 20px 14px">
+      <button onClick="{{ toggleSearchPanel }}" style="display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:999px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};font-size:13px;font-weight:700;color:#1E1C18;cursor:pointer">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#1E1C18" stroke-width="2.2" stroke-linecap="round"/></svg>
+        Add item not in this list
+      </button>
+      <sc-if value="{{ searchOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:10px;padding:14px;border-radius:18px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }}">
+        <div style="font-size:11px;color:{{ textSecondary }};font-weight:600;margin-bottom:10px;line-height:1.5">Searches Open Food Facts (crowdsourced). Anything you add here is marked <b>Unverified</b> until you approve it.</div>
+        <div style="display:flex;gap:4px;background:{{ hairlineSoft }};border-radius:11px;padding:3px;margin-bottom:10px">
+          <button onClick="{{ setSearchModeName }}" style="flex:1;padding:6px 10px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:{{ modeNameBg }};color:#1E1C18">Search by name</button>
+          <button onClick="{{ setSearchModeBarcode }}" style="flex:1;padding:6px 10px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:{{ modeBarcodeBg }};color:#1E1C18">Scan barcode</button>
+        </div>
+        <sc-if value="{{ isSearchModeName }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;gap:8px">
+          <input type="text" value="{{ searchQuery }}" onChange="{{ onSearchQueryChange }}" onKeyDown="{{ onSearchKeyDown }}" placeholder="e.g. Warburtons GF loaf" aria-label="Search foods" style="flex:1;height:40px;border-radius:12px;background:{{ glassBgStrong }};border:1px solid {{ hairline }};padding:0 12px;font-size:13px;color:{{ textPrimary }};box-sizing:border-box;font-family:inherit"/>
+          <button onClick="{{ runSearch }}" style="padding:0 16px;border-radius:12px;background:#4A6B8A;border:none;font-size:13px;font-weight:700;color:#fff;cursor:pointer">Search</button>
+        </div>
+        </sc-if>
+        <sc-if value="{{ isSearchModeBarcode }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:8px">
+          <input type="text" value="{{ searchBarcode }}" onChange="{{ onBarcodeChange }}" onKeyDown="{{ onBarcodeKeyDown }}" placeholder="Enter barcode number" aria-label="Enter barcode number" style="flex:1;height:40px;border-radius:12px;background:{{ glassBgStrong }};border:1px solid {{ hairline }};padding:0 12px;font-size:13px;color:{{ textPrimary }};box-sizing:border-box;font-family:inherit"/>
+          <button onClick="{{ runBarcodeLookup }}" style="padding:0 16px;border-radius:12px;background:#4A6B8A;border:none;font-size:13px;font-weight:700;color:#fff;cursor:pointer">Look up</button>
+        </div>
+        </sc-if>
+        <sc-if value="{{ searchLoading }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:12.5px;color:{{ textSecondary }};font-weight:600;margin-top:10px">Searching Open Food Facts…</div>
+        </sc-if>
+        <sc-if value="{{ searchHasError }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:12.5px;color:#e0304f;font-weight:600;margin-top:10px">{{ searchError }}</div>
+        </sc-if>
+        <sc-if value="{{ r1Show }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 2px;border-top:1px solid {{ hairlineSoft }};margin-top:8px">
+          <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:700">{{ r1Name }}</div><div style="font-size:11.5px;color:{{ textSecondary }};font-weight:500;margin-top:1px">{{ r1Brand }} · {{ r1Kcal }} kcal/100g</div></div>
+          <button onClick="{{ r1Add }}" style="padding:7px 14px;border-radius:999px;background:{{ r1AddBg }};border:none;font-size:12px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0">{{ r1AddLabel }}</button>
+        </div>
+        </sc-if>
+        <sc-if value="{{ r2Show }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 2px;border-top:1px solid {{ hairlineSoft }}">
+          <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:700">{{ r2Name }}</div><div style="font-size:11.5px;color:{{ textSecondary }};font-weight:500;margin-top:1px">{{ r2Brand }} · {{ r2Kcal }} kcal/100g</div></div>
+          <button onClick="{{ r2Add }}" style="padding:7px 14px;border-radius:999px;background:{{ r2AddBg }};border:none;font-size:12px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0">{{ r2AddLabel }}</button>
+        </div>
+        </sc-if>
+        <sc-if value="{{ r3Show }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 2px;border-top:1px solid {{ hairlineSoft }}">
+          <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:700">{{ r3Name }}</div><div style="font-size:11.5px;color:{{ textSecondary }};font-weight:500;margin-top:1px">{{ r3Brand }} · {{ r3Kcal }} kcal/100g</div></div>
+          <button onClick="{{ r3Add }}" style="padding:7px 14px;border-radius:999px;background:{{ r3AddBg }};border:none;font-size:12px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0">{{ r3AddLabel }}</button>
+        </div>
+        </sc-if>
+      </div>
+      </sc-if>
+    </div>
+
+    <!-- diet view — switches the catalog between the standard meat & fish list and the vegan-safe substitution set -->
+    <div style="display:flex;align-items:center;gap:8px;padding:0 20px 14px">
+      <span style="font-size:11.5px;font-weight:700;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.4px">{{ t_diet_view }}</span>
+      <div style="display:flex;gap:4px;background:{{ hairlineSoft }};border-radius:11px;padding:3px;margin-left:6px">
+        <button onClick="{{ setDietStandard }}" style="padding:6px 13px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:{{ dietStdBg }};color:{{ dietStdColor }}">{{ t_standard }}</button>
+        <button onClick="{{ setDietVegan }}" style="padding:6px 13px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:{{ dietVeganBg }};color:{{ dietVeganColor }}">{{ t_vegan }}</button>
+      </div>
+    </div>
+
+    <!-- HERO: items picked up — sticky while scrolling so progress stays at scan speed -->
+    <div style="position:sticky;top:0;z-index:5;margin:0 20px;padding:20px;border-radius:26px;background:linear-gradient(160deg,rgba(255,255,255,.92),{{ glassBgStrong }});backdrop-filter:blur(24px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 20px 40px rgba(30,28,24,.13),0 1px 0 {{ glassBgLight }} inset">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.4px">{{ t_items_picked_up }}</div>
+          <div style="font-size:12px;color:{{ textSecondary }};font-weight:600;margin-top:2px">{{ t_tick_off }}</div>
+        </div>
+        <div style="font-size:28px;font-weight:800;font-family:ui-rounded,'SF Pro Rounded',sans-serif;color:#4A6B8A"><span>{{ checkedCount }}</span><span style="font-size:15px;color:{{ textSecondary }};font-weight:600"> / {{ totalItemsLabel }}</span></div>
+      </div>
+      <div style="height:8px;border-radius:999px;background:rgba(150,150,158,.16);margin-top:14px;overflow:hidden">
+        <div style="width:{{ progressPct }};height:100%;border-radius:999px;background:linear-gradient(90deg,#4A6B8A,#4F7A63)"></div>
+      </div>
+    </div>
+
+    <!-- Category: Breakfast &amp; Dairy -->
+    <div style="margin:16px 20px 0;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 12px 26px rgba(30,28,24,.09);overflow:hidden">
+      <image-slot id="shop-cat-breakfast" shape="rect" placeholder="Category photo" src="assets/img/shop/cat-breakfast.jpeg" fit="cover" style="width:100%;height:100px"></image-slot>
+      <div style="padding:14px">
+        <div style="display:flex;align-items:center;gap:7px;padding-bottom:10px;border-bottom:1px solid {{ hairline }};margin-bottom:4px">
+          <span style="font-size:14px">☕</span>
+          <span style="font-size:12px;font-weight:800;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.4px;flex:1">{{ t_cat_breakfast }}</span>
+          <span style="font-size:13px;font-weight:700;color:{{ textSecondary }}">{{ catBreakfast }}/7</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ b1RowBg }}"><button onClick="{{ b1Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ b1CircleBorder }};background:{{ b1CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ b1CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">Free From Oats 450g</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>Scott's Porage Oats 1kg</option><option>Quaker Oats So Simple 8-pack</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ b2RowBg }}"><button onClick="{{ b2Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ b2CircleBorder }};background:{{ b2CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ b2CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">{{ milkName }}</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>{{ milkOpt1 }}</option><option>{{ milkOpt2 }}</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ b3RowBg }}"><button onClick="{{ b3Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ b3CircleBorder }};background:{{ b3CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ b3CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">Warburtons GF White Sliced Loaf 400g</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>Genius GF Seeded Loaf 400g</option><option>M&amp;S GF White Loaf 400g</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ b4RowBg }}"><button onClick="{{ b4Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ b4CircleBorder }};background:{{ b4CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ b4CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">{{ yoghurtName }}</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>{{ yoghurtOpt1 }}</option><option>{{ yoghurtOpt2 }}</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ b5RowBg }}"><button onClick="{{ b5Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ b5CircleBorder }};background:{{ b5CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ b5CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">Fresh Blueberries 150g</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>Frozen Blueberries 500g</option><option>Fresh Raspberries 150g</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ b6RowBg }}"><button onClick="{{ b6Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ b6CircleBorder }};background:{{ b6CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ b6CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">Fairtrade Bananas 5-pack</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>Fairtrade Bananas Loose (per kg)</option><option>Organic Bananas 5-pack</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ b7RowBg }}"><button onClick="{{ b7Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ b7CircleBorder }};background:{{ b7CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ b7CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">{{ honeyName }}</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>{{ honeyOpt1 }}</option><option>{{ honeyOpt2 }}</option></select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category: Fish (hidden in vegan mode) -->
+    <sc-if value="{{ showMeatFish }}" hint-placeholder-val="{{ true }}">
+    <div style="margin:14px 20px 0;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 12px 26px rgba(30,28,24,.09);overflow:hidden">
+      <image-slot id="shop-cat-fish" shape="rect" placeholder="Category photo" src="assets/img/shop/cat-fish-meat.jpeg" fit="cover" style="width:100%;height:100px"></image-slot>
+      <div style="padding:14px">
+        <div style="display:flex;align-items:center;gap:7px;padding-bottom:10px;border-bottom:1px solid {{ hairline }};margin-bottom:4px">
+          <span style="font-size:14px">🐟</span>
+          <span style="font-size:12px;font-weight:800;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.4px;flex:1">{{ t_cat_fish }}</span>
+          <span style="font-size:13px;font-weight:700;color:{{ textSecondary }}">{{ catFish }}/5</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ f1RowBg }}"><button onClick="{{ f1Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ f1CircleBorder }};background:{{ f1CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ f1CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">Scottish Salmon Fillets 360g</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>Frozen Salmon Fillets 4-pack</option><option>Norwegian Salmon Fillets 300g</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ f2RowBg }}"><button onClick="{{ f2Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ f2CircleBorder }};background:{{ f2CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ f2CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">Cod Fillets 360g</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>Haddock Fillets 360g</option><option>Frozen Cod Loins 400g</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ f3RowBg }}"><button onClick="{{ f3Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ f3CircleBorder }};background:{{ f3CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ f3CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">Sea Bass Fillets 240g</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>Trout Fillets 240g</option><option>Bream Fillets 240g</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ f4RowBg }}"><button onClick="{{ f4Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ f4CircleBorder }};background:{{ f4CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ f4CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">Tuna in Spring Water 4&times;145g</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>Tuna in Sunflower Oil 4x145g</option><option>Mackerel in Spring Water 4x125g</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ f5RowBg }}"><button onClick="{{ f5Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ f5CircleBorder }};background:{{ f5CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ f5CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">Scottish Smoked Salmon 100g</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>Smoked Trout 100g</option><option>Smoked Mackerel Fillets 200g</option></select>
+          </div>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- Category: Poultry &amp; Meat (hidden in vegan mode) -->
+    <sc-if value="{{ showMeatFish }}" hint-placeholder-val="{{ true }}">
+    <div style="margin:14px 20px 0;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 12px 26px rgba(30,28,24,.09);overflow:hidden">
+      <image-slot id="shop-cat-poultry" shape="rect" placeholder="Category photo" src="assets/img/shop/cat-fish-meat.jpeg" fit="cover" style="width:100%;height:100px"></image-slot>
+      <div style="padding:14px">
+        <div style="display:flex;align-items:center;gap:7px;padding-bottom:10px;border-bottom:1px solid {{ hairline }};margin-bottom:4px">
+          <span style="font-size:14px">🍖</span>
+          <span style="font-size:12px;font-weight:800;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.4px;flex:1">{{ t_cat_poultry }}</span>
+          <span style="font-size:13px;font-weight:700;color:{{ textSecondary }}">{{ catPoultry }}/4</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ p1RowBg }}"><button onClick="{{ p1Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ p1CircleBorder }};background:{{ p1CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ p1CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">British Chicken Breast 640g</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>Chicken Mini Fillets 500g</option><option>Free Range Chicken Breast 600g</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ p2RowBg }}"><button onClick="{{ p2Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ p2CircleBorder }};background:{{ p2CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ p2CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Chicken Thigh Fillets 600g</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ p3RowBg }}"><button onClick="{{ p3Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ p3CircleBorder }};background:{{ p3CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ p3CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">British Turkey Mince 500g</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>Lean Beef Mince 500g</option><option>Chicken Mince 500g</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ p4RowBg }}"><button onClick="{{ p4Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ p4CircleBorder }};background:{{ p4CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ p4CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">British Pork Tenderloin ~460g</span>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- Category: Vegan Proteins (shown only in vegan mode — replaces Fish + Poultry & Meat) -->
+    <sc-if value="{{ isVegan }}" hint-placeholder-val="{{ false }}">
+    <div style="margin:14px 20px 0;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 12px 26px rgba(30,28,24,.09);overflow:hidden">
+      <image-slot id="shop-cat-vegan" shape="rect" placeholder="Category photo" src="assets/img/shop/cat-veg.jpeg" fit="cover" style="width:100%;height:100px"></image-slot>
+      <div style="padding:14px">
+        <div style="display:flex;align-items:center;gap:7px;padding-bottom:10px;border-bottom:1px solid {{ hairline }};margin-bottom:4px">
+          <span style="font-size:14px">🌱</span>
+          <span style="font-size:12px;font-weight:800;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.4px;flex:1">{{ t_cat_vegan_proteins }}</span>
+          <span style="font-size:13px;font-weight:700;color:{{ textSecondary }}">{{ catVeganProteins }}/5</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ vp1RowBg }}"><button onClick="{{ vp1Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ vp1CircleBorder }};background:{{ vp1CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ vp1CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">Firm Tofu Block 396g</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>Smoked Tofu 200g</option><option>Marinated Tofu Pieces 280g</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ vp2RowBg }}"><button onClick="{{ vp2Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ vp2CircleBorder }};background:{{ vp2CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ vp2CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">Quorn Vegan Pieces 300g</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>Quorn Vegan Mince 300g</option><option>Vivera Plant Mince 250g</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ vp3RowBg }}"><button onClick="{{ vp3Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ vp3CircleBorder }};background:{{ vp3CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ vp3CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Cooked Green Lentils 400g</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ vp4RowBg }}"><button onClick="{{ vp4Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ vp4CircleBorder }};background:{{ vp4CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ vp4CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Chickpeas in Water 400g</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ vp5RowBg }}"><button onClick="{{ vp5Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ vp5CircleBorder }};background:{{ vp5CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ vp5CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">Alpro Soya Protein Yoghurt Alt 4x150g</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>Koko Dairy-Free Yoghurt 350g</option><option>Oatly Oatgurt 400g</option></select>
+          </div>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- Category: Eggs &amp; Dairy-free -->
+    <div style="margin:14px 20px 0;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 12px 26px rgba(30,28,24,.09);overflow:hidden">
+      <image-slot id="shop-cat-eggs" shape="rect" placeholder="Category photo" src="assets/img/shop/cat-eggs.jpeg" fit="cover" style="width:100%;height:100px"></image-slot>
+      <div style="padding:14px">
+        <div style="display:flex;align-items:center;gap:7px;padding-bottom:10px;border-bottom:1px solid {{ hairline }};margin-bottom:4px">
+          <span style="font-size:14px">🥚</span>
+          <span style="font-size:12px;font-weight:800;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.4px;flex:1">{{ t_cat_eggs }}</span>
+          <span style="font-size:13px;font-weight:700;color:{{ textSecondary }}">{{ catEggs }}/4</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ e1RowBg }}"><button onClick="{{ e1Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ e1CircleBorder }};background:{{ e1CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ e1CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">{{ eggsName }}</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>{{ eggsOpt1 }}</option><option>{{ eggsOpt2 }}</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ e2RowBg }}"><button onClick="{{ e2Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ e2CircleBorder }};background:{{ e2CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ e2CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">Oatly Custard 400g</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>Alpro Custard Style 525g</option><option>Ambrosia Devon Custard 400g</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ e3RowBg }}"><button onClick="{{ e3Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ e3CircleBorder }};background:{{ e3CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ e3CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">Flora Plant Butter Salted 250g</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>Vitalite Dairy-Free Spread 500g</option><option>Pure Sunflower Spread 500g</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ e4RowBg }}"><button onClick="{{ e4Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ e4CircleBorder }};background:{{ e4CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ e4CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">Meridian Smooth Almond Butter 170g</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>Meridian Crunchy Peanut Butter 280g</option><option>Pip &amp; Nut Almond Butter 170g</option></select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category: Carbs &amp; Staples -->
+    <div style="margin:14px 20px 0;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 12px 26px rgba(30,28,24,.09);overflow:hidden">
+      <image-slot id="shop-cat-carbs" shape="rect" placeholder="Category photo" src="assets/img/shop/cat-carbs.jpeg" fit="cover" style="width:100%;height:100px"></image-slot>
+      <div style="padding:14px">
+        <div style="display:flex;align-items:center;gap:7px;padding-bottom:10px;border-bottom:1px solid {{ hairline }};margin-bottom:4px">
+          <span style="font-size:14px">🌾</span>
+          <span style="font-size:12px;font-weight:800;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.4px;flex:1">{{ t_cat_carbs }}</span>
+          <span style="font-size:13px;font-weight:700;color:{{ textSecondary }}">{{ catCarbs }}/6</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ c1RowBg }}"><button onClick="{{ c1Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ c1CircleBorder }};background:{{ c1CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ c1CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">Easy Cook Basmati Rice 1kg</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>Tilda Pure Basmati Rice 1kg</option><option>Brown Basmati Rice 1kg</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ c2RowBg }}"><button onClick="{{ c2Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;border:{{ c2CircleBorder }};background:{{ c2CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ c2CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">FF Penne 500g</div>
+            <select style="font-size:12.5px;font-weight:700;color:#4A6B8A;background:transparent;border:none;padding:4px 16px 4px 0;margin-top:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234A6B8A' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;background-size:10px;font-family:inherit"><option>Original choice</option><option>FF Fusilli 500g</option><option>Rice Penne 500g</option></select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ c3RowBg }}"><button onClick="{{ c3Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ c3CircleBorder }};background:{{ c3CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ c3CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Sweet Potatoes 500g</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ c4RowBg }}"><button onClick="{{ c4Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ c4CircleBorder }};background:{{ c4CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ c4CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">White Potatoes 2.5kg</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ c5RowBg }}"><button onClick="{{ c5Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ c5CircleBorder }};background:{{ c5CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ c5CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Nairn's GF Oatcakes 135g</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ c6RowBg }}"><button onClick="{{ c6Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ c6CircleBorder }};background:{{ c6CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ c6CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">No Salt Rice Cakes 135g</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category: Vegetables -->
+    <div style="margin:14px 20px 0;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 12px 26px rgba(30,28,24,.09);overflow:hidden">
+      <image-slot id="shop-cat-veg" shape="rect" placeholder="Category photo" src="assets/img/shop/cat-veg.jpeg" fit="cover" style="width:100%;height:100px"></image-slot>
+      <div style="padding:14px">
+        <div style="display:flex;align-items:center;gap:7px;padding-bottom:10px;border-bottom:1px solid {{ hairline }};margin-bottom:4px">
+          <span style="font-size:14px">🥦</span>
+          <span style="font-size:12px;font-weight:800;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.4px;flex:1">{{ t_cat_veg }}</span>
+          <span style="font-size:13px;font-weight:700;color:{{ textSecondary }}">{{ catVeg }}/7</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ v1RowBg }}"><button onClick="{{ v1Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ v1CircleBorder }};background:{{ v1CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ v1CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Courgettes 3-pack</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ v2RowBg }}"><button onClick="{{ v2Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ v2CircleBorder }};background:{{ v2CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ v2CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Carrots 1kg</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ v3RowBg }}"><button onClick="{{ v3Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ v3CircleBorder }};background:{{ v3CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ v3CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Baby Spinach 200g</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ v4RowBg }}"><button onClick="{{ v4Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ v4CircleBorder }};background:{{ v4CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ v4CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Fine Green Beans 220g</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ v5RowBg }}"><button onClick="{{ v5Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ v5CircleBorder }};background:{{ v5CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ v5CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Broccoli 400g</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ v6RowBg }}"><button onClick="{{ v6Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ v6CircleBorder }};background:{{ v6CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ v6CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Butternut Squash 700g</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ v7RowBg }}"><button onClick="{{ v7Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ v7CircleBorder }};background:{{ v7CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ v7CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Leeks 500g</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category: Fruit -->
+    <div style="margin:14px 20px 0;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 12px 26px rgba(30,28,24,.09);overflow:hidden">
+      <image-slot id="shop-cat-fruit" shape="rect" placeholder="Category photo" src="assets/img/shop/cat-fruit.jpeg" fit="cover" style="width:100%;height:100px"></image-slot>
+      <div style="padding:14px">
+        <div style="display:flex;align-items:center;gap:7px;padding-bottom:10px;border-bottom:1px solid {{ hairline }};margin-bottom:4px">
+          <span style="font-size:14px">🍎</span>
+          <span style="font-size:12px;font-weight:800;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.4px;flex:1">{{ t_cat_fruit }}</span>
+          <span style="font-size:13px;font-weight:700;color:{{ textSecondary }}">{{ catFruit }}/4</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ fr1RowBg }}"><button onClick="{{ fr1Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ fr1CircleBorder }};background:{{ fr1CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ fr1CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Kiwi Fruit 4-pack</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ fr2RowBg }}"><button onClick="{{ fr2Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ fr2CircleBorder }};background:{{ fr2CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ fr2CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Conference Pears 4-pack</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ fr3RowBg }}"><button onClick="{{ fr3Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ fr3CircleBorder }};background:{{ fr3CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ fr3CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">British Strawberries 400g</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ fr4RowBg }}"><button onClick="{{ fr4Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ fr4CircleBorder }};background:{{ fr4CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ fr4CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Cantaloupe Melon</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category: Pantry -->
+    <div style="margin:14px 20px 0;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 12px 26px rgba(30,28,24,.09);overflow:hidden">
+      <image-slot id="shop-cat-pantry" shape="rect" placeholder="Category photo" src="assets/img/shop/cat-pantry.jpeg" fit="cover" style="width:100%;height:100px"></image-slot>
+      <div style="padding:14px">
+        <div style="display:flex;align-items:center;gap:7px;padding-bottom:10px;border-bottom:1px solid {{ hairline }};margin-bottom:4px">
+          <span style="font-size:14px">🫙</span>
+          <span style="font-size:12px;font-weight:800;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.4px;flex:1">{{ t_cat_pantry }}</span>
+          <span style="font-size:13px;font-weight:700;color:{{ textSecondary }}">{{ catPantry }}/8</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ pa1RowBg }}"><button onClick="{{ pa1Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ pa1CircleBorder }};background:{{ pa1CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ pa1CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Chopped Tomatoes 4&times;400g</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ pa2RowBg }}"><button onClick="{{ pa2Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ pa2CircleBorder }};background:{{ pa2CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ pa2CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Red Split Lentils 500g</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ pa3RowBg }}"><button onClick="{{ pa3Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ pa3CircleBorder }};background:{{ pa3CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ pa3CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Kallo GF Chicken Stock Cubes x6</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ pa4RowBg }}"><button onClick="{{ pa4Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ pa4CircleBorder }};background:{{ pa4CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ pa4CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Filippo Berio Garlic Infused Oil 200ml</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ pa5RowBg }}"><button onClick="{{ pa5Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ pa5CircleBorder }};background:{{ pa5CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ pa5CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Extra Virgin Olive Oil 500ml</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ pa6RowBg }}"><button onClick="{{ pa6Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ pa6CircleBorder }};background:{{ pa6CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ pa6CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Pure Maple Syrup 250ml</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ pa7RowBg }}"><button onClick="{{ pa7Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ pa7CircleBorder }};background:{{ pa7CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ pa7CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Peppermint Tea Bags x20</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:48px;border-top:1px solid {{ hairlineSoft }};background:{{ pa8RowBg }}"><button onClick="{{ pa8Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ pa8CircleBorder }};background:{{ pa8CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ pa8CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span style="flex:1;font-size:14px;font-weight:600">Fresh Root Ginger ~100g</span>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Category: Added items (from Open Food Facts search/barcode — pending_review until approved) -->
+    <sc-if value="{{ hasAddedItems }}" hint-placeholder-val="{{ false }}">
+    <div style="margin:14px 20px 0;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 12px 26px rgba(30,28,24,.09);overflow:hidden">
+      <div style="padding:14px">
+        <div style="display:flex;align-items:center;gap:7px;padding-bottom:10px;border-bottom:1px solid {{ hairline }};margin-bottom:4px">
+          <span style="font-size:14px">🔎</span>
+          <span style="font-size:12px;font-weight:800;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.4px;flex:1">Added items</span>
+          <span style="font-size:13px;font-weight:700;color:{{ textSecondary }}">{{ addedItemsCountLabel }}</span>
+        </div>
+        <sc-if value="{{ ai1Show }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ ai1RowBg }}"><button onClick="{{ ai1Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ ai1CircleBorder }};background:{{ ai1CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ ai1CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">{{ ai1Name }}</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+              <span style="font-size:12px;color:{{ textSecondary }};font-weight:500">{{ ai1Sub }}</span>
+              <span style="display:{{ ai1Pill }};font-size:10px;font-weight:800;letter-spacing:.3px;color:#d98816;background:rgba(217,136,22,.16);padding:2px 7px;border-radius:999px;text-transform:uppercase">Unverified</span>
+            </div>
+          </div>
+          <sc-if value="{{ ai1PendingReview }}" hint-placeholder-val="{{ false }}">
+          <button aria-label="Approve" onClick="{{ ai1Approve }}" style="width:26px;height:26px;border-radius:50%;background:rgba(79,122,99,.14);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#4F7A63" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button aria-label="Reject" onClick="{{ ai1Reject }}" style="width:26px;height:26px;border-radius:50%;background:rgba(224,48,79,.12);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-left:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#e0304f" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+          </sc-if>
+        </div>
+        </sc-if>
+        <sc-if value="{{ ai2Show }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ ai2RowBg }}"><button onClick="{{ ai2Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ ai2CircleBorder }};background:{{ ai2CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ ai2CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">{{ ai2Name }}</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+              <span style="font-size:12px;color:{{ textSecondary }};font-weight:500">{{ ai2Sub }}</span>
+              <span style="display:{{ ai2Pill }};font-size:10px;font-weight:800;letter-spacing:.3px;color:#d98816;background:rgba(217,136,22,.16);padding:2px 7px;border-radius:999px;text-transform:uppercase">Unverified</span>
+            </div>
+          </div>
+          <sc-if value="{{ ai2PendingReview }}" hint-placeholder-val="{{ false }}">
+          <button aria-label="Approve" onClick="{{ ai2Approve }}" style="width:26px;height:26px;border-radius:50%;background:rgba(79,122,99,.14);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#4F7A63" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button aria-label="Reject" onClick="{{ ai2Reject }}" style="width:26px;height:26px;border-radius:50%;background:rgba(224,48,79,.12);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-left:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#e0304f" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+          </sc-if>
+        </div>
+        </sc-if>
+        <sc-if value="{{ ai3Show }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ ai3RowBg }}"><button onClick="{{ ai3Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ ai3CircleBorder }};background:{{ ai3CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ ai3CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">{{ ai3Name }}</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+              <span style="font-size:12px;color:{{ textSecondary }};font-weight:500">{{ ai3Sub }}</span>
+              <span style="display:{{ ai3Pill }};font-size:10px;font-weight:800;letter-spacing:.3px;color:#d98816;background:rgba(217,136,22,.16);padding:2px 7px;border-radius:999px;text-transform:uppercase">Unverified</span>
+            </div>
+          </div>
+          <sc-if value="{{ ai3PendingReview }}" hint-placeholder-val="{{ false }}">
+          <button aria-label="Approve" onClick="{{ ai3Approve }}" style="width:26px;height:26px;border-radius:50%;background:rgba(79,122,99,.14);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#4F7A63" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button aria-label="Reject" onClick="{{ ai3Reject }}" style="width:26px;height:26px;border-radius:50%;background:rgba(224,48,79,.12);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-left:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#e0304f" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+          </sc-if>
+        </div>
+        </sc-if>
+        <sc-if value="{{ ai4Show }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ ai4RowBg }}"><button onClick="{{ ai4Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ ai4CircleBorder }};background:{{ ai4CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ ai4CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">{{ ai4Name }}</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+              <span style="font-size:12px;color:{{ textSecondary }};font-weight:500">{{ ai4Sub }}</span>
+              <span style="display:{{ ai4Pill }};font-size:10px;font-weight:800;letter-spacing:.3px;color:#d98816;background:rgba(217,136,22,.16);padding:2px 7px;border-radius:999px;text-transform:uppercase">Unverified</span>
+            </div>
+          </div>
+          <sc-if value="{{ ai4PendingReview }}" hint-placeholder-val="{{ false }}">
+          <button aria-label="Approve" onClick="{{ ai4Approve }}" style="width:26px;height:26px;border-radius:50%;background:rgba(79,122,99,.14);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#4F7A63" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button aria-label="Reject" onClick="{{ ai4Reject }}" style="width:26px;height:26px;border-radius:50%;background:rgba(224,48,79,.12);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-left:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#e0304f" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+          </sc-if>
+        </div>
+        </sc-if>
+        <sc-if value="{{ ai5Show }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 2px;min-height:52px;border-top:1px solid {{ hairlineSoft }};background:{{ ai5RowBg }}"><button onClick="{{ ai5Toggle }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;border:{{ ai5CircleBorder }};background:{{ ai5CircleBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="display:{{ ai5CheckDisplay }}"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600">{{ ai5Name }}</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+              <span style="font-size:12px;color:{{ textSecondary }};font-weight:500">{{ ai5Sub }}</span>
+              <span style="display:{{ ai5Pill }};font-size:10px;font-weight:800;letter-spacing:.3px;color:#d98816;background:rgba(217,136,22,.16);padding:2px 7px;border-radius:999px;text-transform:uppercase">Unverified</span>
+            </div>
+          </div>
+          <sc-if value="{{ ai5PendingReview }}" hint-placeholder-val="{{ false }}">
+          <button aria-label="Approve" onClick="{{ ai5Approve }}" style="width:26px;height:26px;border-radius:50%;background:rgba(79,122,99,.14);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#4F7A63" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button aria-label="Reject" onClick="{{ ai5Reject }}" style="width:26px;height:26px;border-radius:50%;background:rgba(224,48,79,.12);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-left:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#e0304f" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+          </sc-if>
+        </div>
+        </sc-if>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- export -->
+    <div style="padding:16px 20px 0">
+      <button style="width:100%;height:52px;border-radius:16px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};font-size:14px;font-weight:700;color:#1E1C18;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3v13m0 0l-4-4m4 4l4-4M5 21h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {{ t_export_list }}
+      </button>
+    </div>
+
+    <!-- Planner impact -->
+    <div style="margin:16px 20px 0;padding:16px;border-radius:20px;background:linear-gradient(155deg,{{ glassBgStrong }},{{ glassBgLight }});backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 10px 22px {{ hairline }},0 1px 0 {{ glassBgLight }} inset">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px">
+        <span style="width:26px;height:26px;border-radius:9px;background:rgba(74,107,138,.14);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#4A6B8A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span style="font-size:12px;font-weight:700;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.3px">{{ t_planner_impact }}</span>
+      </div>
+      <div style="font-size:14px;font-weight:600">{{ t_meal_categories_covered }}</div>
+    </div>
+
+    <!-- Missing — 2026-08-14: was a 10-row list repeating "Required for today's targets" under every
+         single item (~450px tall); collapsed to one shared caption + a wrapped chip row, same 10 items,
+         no data dropped. Part of the density pass, see gauntlet-loop log for the reasoning. -->
+    <div style="margin:12px 20px 0;padding:16px;border-radius:20px;background:linear-gradient(155deg,{{ glassBgStrong }},{{ glassBgLight }});backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 10px 22px {{ hairline }},0 1px 0 {{ glassBgLight }} inset">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:8px">
+        <span style="width:26px;height:26px;border-radius:9px;background:rgba(224,48,79,.14);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#e0304f" stroke-width="1.6"/><path d="M12 8v5M12 16h.01" stroke="#e0304f" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </span>
+        <span style="font-size:12px;font-weight:700;color:{{ textSecondary }};text-transform:uppercase;letter-spacing:.3px">{{ t_missing_heading }}</span>
+      </div>
+      <div style="font-size:12px;color:{{ textSecondary }};font-weight:500;margin-bottom:10px">{{ t_required_for_targets }}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px">
+        <span style="padding:6px 12px;border-radius:999px;background:rgba(224,48,79,.09);border:1px solid rgba(224,48,79,.18);font-size:12.5px;font-weight:700;color:#1E1C18">{{ t_missing_oats }}</span>
+        <span style="padding:6px 12px;border-radius:999px;background:rgba(224,48,79,.09);border:1px solid rgba(224,48,79,.18);font-size:12.5px;font-weight:700;color:#1E1C18">{{ t_missing_milk }}</span>
+        <span style="padding:6px 12px;border-radius:999px;background:rgba(224,48,79,.09);border:1px solid rgba(224,48,79,.18);font-size:12.5px;font-weight:700;color:#1E1C18">{{ t_missing_bread }}</span>
+        <span style="padding:6px 12px;border-radius:999px;background:rgba(224,48,79,.09);border:1px solid rgba(224,48,79,.18);font-size:12.5px;font-weight:700;color:#1E1C18">{{ t_missing_yoghurt }}</span>
+        <span style="padding:6px 12px;border-radius:999px;background:rgba(224,48,79,.09);border:1px solid rgba(224,48,79,.18);font-size:12.5px;font-weight:700;color:#1E1C18">{{ t_cat_fruit }}</span>
+        <span style="padding:6px 12px;border-radius:999px;background:rgba(224,48,79,.09);border:1px solid rgba(224,48,79,.18);font-size:12.5px;font-weight:700;color:#1E1C18">{{ t_missing_eggs }}</span>
+        <span style="padding:6px 12px;border-radius:999px;background:rgba(224,48,79,.09);border:1px solid rgba(224,48,79,.18);font-size:12.5px;font-weight:700;color:#1E1C18">{{ t_missing_rice }}</span>
+        <span style="padding:6px 12px;border-radius:999px;background:rgba(224,48,79,.09);border:1px solid rgba(224,48,79,.18);font-size:12.5px;font-weight:700;color:#1E1C18">{{ t_missing_pasta }}</span>
+        <span style="padding:6px 12px;border-radius:999px;background:rgba(224,48,79,.09);border:1px solid rgba(224,48,79,.18);font-size:12.5px;font-weight:700;color:#1E1C18">{{ t_missing_potato }}</span>
+        <span style="padding:6px 12px;border-radius:999px;background:rgba(224,48,79,.09);border:1px solid rgba(224,48,79,.18);font-size:12.5px;font-weight:700;color:#1E1C18">{{ t_missing_veg }}</span>
+      </div>
+    </div>
+
+    <!-- Planner impact + Missing now sit as a two-up bento pair where space allows; Planner impact stays
+         full-width above since it's a single sentence, not a list, and pairing it would look unbalanced
+         next to the chip cloud. -->
+
+  </div>
+
+  <!-- tab bar -->
+  <div style="position:absolute;z-index:2;left:0;right:0;bottom:0;height:84px;padding-bottom:20px;display:flex;background:{{ glassBg }};backdrop-filter:blur(24px) saturate(160%);border-top:1px solid {{ hairline }}">
+    <a href="KindFare Home Redesign.dc.html" style="text-decoration:none;display:contents"><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:{{ textSecondary }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M4 11.5L12 4l8 7.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9a1 1 0 001 1h10a1 1 0 001-1v-9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span style="font-size:12px;font-weight:600">{{ t_nav_home }}</span>
+    </div></a>
+    <a href="KindFare Shop Redesign.dc.html" style="text-decoration:none;display:contents"><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#4A6B8A">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M6 8h12l-1.2 10.2a2 2 0 01-2 1.8H9.2a2 2 0 01-2-1.8L6 8z" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span style="font-size:12px;font-weight:600">{{ t_nav_shop }}</span>
+    </div></a>
+    <a href="KindFare Plan Redesign.dc.html" style="text-decoration:none;display:contents"><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:{{ textSecondary }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4M22 12v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2h11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span style="font-size:12px;font-weight:600">{{ t_nav_plan }}</span>
+    </div></a>
+    <a href="KindFare Exercises Redesign.dc.html" style="text-decoration:none;display:contents"><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:{{ textSecondary }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M4 12h4l2-7 4 14 2-7h4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span style="font-size:12px;font-weight:600">{{ t_nav_exercises }}</span>
+    </div></a>
+    <a href="KindFare Profile Redesign.dc.html" style="text-decoration:none;display:contents"><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:{{ textSecondary }}">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2.4"/><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span style="font-size:12px;font-weight:600">{{ t_nav_profile }}</span>
+    </div></a>
+  </div>
+
+
+    <sc-if value="{{ langPickerOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;z-index:100;background:{{ outerBg }}">
+        <div style="position:absolute;inset:0;z-index:1;overflow-y:auto;box-sizing:border-box;padding:54px 20px 40px">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px">
+            <button aria-label="Back" onClick="{{ toggleLangPicker }}" style="width:36px;height:36px;border-radius:50%;background:{{ glassBg }};border:1px solid {{ hairline }};display:flex;align-items:center;justify-content:center;cursor:pointer;color:{{ textPrimary }};flex-shrink:0">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <h1 style="font-size:22px;font-weight:700;letter-spacing:-.3px;font-family:ui-serif,Georgia,serif;margin:0;color:{{ textPrimary }}">{{ t_choose_language }}</h1>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <button onClick="{{ setLangEn }}" style="width:100%;text-align:left;padding:17px 18px;border-radius:16px;border:1px solid {{ hairline }};background:{{ langEnBg }};color:{{ textPrimary }};font-size:15.5px;font-weight:600;cursor:pointer">English</button>
+            <button onClick="{{ setLangPt }}" style="width:100%;text-align:left;padding:17px 18px;border-radius:16px;border:1px solid {{ hairline }};background:{{ langPtBg }};color:{{ textPrimary }};font-size:15.5px;font-weight:600;cursor:pointer">Português</button>
+            <button onClick="{{ setLangHi }}" style="width:100%;text-align:left;padding:17px 18px;border-radius:16px;border:1px solid {{ hairline }};background:{{ langHiBg }};color:{{ textPrimary }};font-size:15.5px;font-weight:600;cursor:pointer;font-family:'Noto Sans Devanagari','Inter',sans-serif">हिन्दी</button>
+            <button onClick="{{ setLangEs }}" style="width:100%;text-align:left;padding:17px 18px;border-radius:16px;border:1px solid {{ hairline }};background:{{ langEsBg }};color:{{ textPrimary }};font-size:15.5px;font-weight:600;cursor:pointer">Español</button>
+            <button onClick="{{ setLangFr }}" style="width:100%;text-align:left;padding:17px 18px;border-radius:16px;border:1px solid {{ hairline }};background:{{ langFrBg }};color:{{ textPrimary }};font-size:15.5px;font-weight:600;cursor:pointer">Français</button>
+            <button onClick="{{ setLangUr }}" style="width:100%;text-align:left;padding:17px 18px;border-radius:16px;border:1px solid {{ hairline }};background:{{ langUrBg }};color:{{ textPrimary }};font-size:15.5px;font-weight:600;cursor:pointer;font-family:'Noto Nastaliq Urdu','Inter',sans-serif">اردو</button>
+          </div>
+
+          <button onClick="{{ confirmLangPicker }}" style="width:100%;margin-top:18px;padding:16px;border-radius:16px;border:none;background:#4A6B8A;color:#fff;font-size:15.5px;font-weight:700;cursor:pointer;box-shadow:0 10px 22px rgba(74,107,138,.28)">{{ t_done }}</button>
+
+          <!-- rotating globe — decorative, animation only, purely on the language picker page -->
+          <div style="display:flex;justify-content:center;margin-top:32px;perspective:600px">
+            <div style="width:46px;height:46px;animation:kf-globe-spin 5s linear infinite;transform-style:preserve-3d">
+              <svg width="46" height="46" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="#4A6B8A" stroke-width="1.4"/>
+                <ellipse cx="12" cy="12" rx="3.6" ry="9" stroke="#4A6B8A" stroke-width="1.2"/>
+                <ellipse cx="12" cy="12" rx="7.2" ry="9" stroke="#4A6B8A" stroke-width="1.2"/>
+                <path d="M3 12h18" stroke="#4A6B8A" stroke-width="1.2"/>
+                <path d="M4.5 7.5h15" stroke="#4A6B8A" stroke-width="1"/>
+                <path d="M4.5 16.5h15" stroke="#4A6B8A" stroke-width="1"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    dark: false, dietMode: 'standard', lang: (window.KindFareI18n ? KindFareI18n.getLang() : 'en'), langPickerOpen: false, pendingLang: null, itemChecked: {},
+    // Open Food Facts search/add-item flow — see kindfare-openfoodfacts.js
+    searchOpen: false, searchMode: 'name', searchQuery: '', searchBarcode: '',
+    searchResults: [], searchLoading: false, searchError: null,
+    addedItems: [], // items added via search/barcode; each starts reviewStatus:'pending_review' until approved
+  };
+  catTotalsByMode = {
+    standard: { catBreakfast: 7, catFish: 5, catPoultry: 4, catEggs: 4, catCarbs: 6, catVeg: 7, catFruit: 4, catPantry: 8, catVeganProteins: 0 },
+    vegan: { catBreakfast: 7, catFish: 0, catPoultry: 0, catEggs: 4, catCarbs: 6, catVeg: 7, catFruit: 4, catPantry: 8, catVeganProteins: 5 },
+  };
+  // item ids in on-page order, grouped by category — each item is now individually tappable
+  // (previously all 50 items shared one global "allChecked" flag with no per-item state).
+  catItems = {
+    catBreakfast: ['b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7'],
+    catFish: ['f1', 'f2', 'f3', 'f4', 'f5'],
+    catPoultry: ['p1', 'p2', 'p3', 'p4'],
+    catVeganProteins: ['vp1', 'vp2', 'vp3', 'vp4', 'vp5'],
+    catEggs: ['e1', 'e2', 'e3', 'e4'],
+    catCarbs: ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'],
+    catVeg: ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7'],
+    catFruit: ['fr1', 'fr2', 'fr3', 'fr4'],
+    catPantry: ['pa1', 'pa2', 'pa3', 'pa4', 'pa5', 'pa6', 'pa7', 'pa8'],
+  };
+  allItemIds = Object.values(this.catItems).flat();
+  renderVals() {
+    const d = this.state.dark;
+    const V = this.state.dietMode === 'vegan';
+    const catTotals = this.catTotalsByMode[this.state.dietMode];
+    const totalItems = Object.values(catTotals).reduce((a, b) => a + b, 0);
+    const ic = this.state.itemChecked;
+    const isChecked = (id) => !!ic[id];
+    const toggleItem = (id) => { if (window.KindFareSound) window.KindFareSound.success(); this.setState((s) => ({ itemChecked: { ...s.itemChecked, [id]: !s.itemChecked[id] } })); };
+    const countChecked = (idList) => idList.reduce((n, id) => n + (isChecked(id) ? 1 : 0), 0);
+    const catVals = {};
+    for (const [k, idList] of Object.entries(this.catItems)) catVals[k] = countChecked(idList);
+    const relevantCats = V
+      ? ['catBreakfast', 'catVeganProteins', 'catEggs', 'catCarbs', 'catVeg', 'catFruit', 'catPantry']
+      : ['catBreakfast', 'catFish', 'catPoultry', 'catEggs', 'catCarbs', 'catVeg', 'catFruit', 'catPantry'];
+    const checkedCount = relevantCats.reduce((n, k) => n + catVals[k], 0);
+    // per-item look: same tap-to-check green style as the Plan page (green fill + white check,
+    // light green row tint when checked, tap sound) — requested to match exactly.
+    const itemVals = {};
+    for (const id of this.allItemIds) {
+      const on = isChecked(id);
+      itemVals[id + 'RowBg'] = on ? 'rgba(79,122,99,.10)' : 'transparent';
+      itemVals[id + 'CircleBg'] = on ? '#4F7A63' : 'transparent';
+      itemVals[id + 'CircleBorder'] = on ? 'none' : (d ? '1.5px solid rgba(255,255,255,.22)' : '1.5px solid rgba(30,28,24,.18)');
+      itemVals[id + 'CheckDisplay'] = on ? 'flex' : 'none';
+      itemVals[id + 'Toggle'] = () => toggleItem(id);
+    }
+    const setDiet = (mode) => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ dietMode: mode }); };
+    const segOn = { bg: '#fff', color: '#1E1C18' }, segOff = { bg: 'transparent', color: d ? '#b3a899' : '#6B6050' };
+    const lang = this.state.lang;
+    const selLang = this.state.pendingLang ?? lang;
+    const t = (key) => window.KindFareI18n ? KindFareI18n.t(key, lang) : key;
+    const langSeg = (active) => active ? { bg: 'rgba(74,107,138,.14)' } : { bg: 'transparent' };
+    const i18nVals = {
+      lang,
+      langPickerOpen: this.state.langPickerOpen,
+      toggleLangPicker: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState(s => ({ langPickerOpen: !s.langPickerOpen, pendingLang: null })); },
+      setLangEn: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ pendingLang: 'en' }); },
+      setLangPt: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ pendingLang: 'pt' }); },
+      setLangHi: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ pendingLang: 'hi' }); },
+      setLangEs: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ pendingLang: 'es' }); },
+      setLangFr: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ pendingLang: 'fr' }); },
+      setLangUr: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ pendingLang: 'ur' }); },
+      confirmLangPicker: () => { const nl = this.state.pendingLang || lang; if (window.KindFareI18n) KindFareI18n.setLang(nl); if (window.KindFareSound) window.KindFareSound.success(); this.setState({ lang: nl, langPickerOpen: false, pendingLang: null }); },
+      langEnBg: langSeg(selLang === 'en').bg,
+      langPtBg: langSeg(selLang === 'pt').bg,
+      langHiBg: langSeg(selLang === 'hi').bg,
+      langEsBg: langSeg(selLang === 'es').bg,
+      langFrBg: langSeg(selLang === 'fr').bg,
+      langUrBg: langSeg(selLang === 'ur').bg,
+      t_change_language: t('common.language_aria'),
+      t_choose_language: t('common.choose_language'), t_done: t('common.done'),
+      t_toggle_dark_mode: t('common.toggle_dark_mode'),
+      t_based_on_plan: t('shop.based_on_plan'),
+      t_heading: t('shop.heading'),
+      t_select_all: t('shop.select_all'),
+      t_clear: t('shop.clear'),
+      t_diet_view: t('shop.diet_view'),
+      t_standard: t('shop.standard'),
+      t_vegan: t('shop.vegan'),
+      t_items_picked_up: t('shop.items_picked_up'),
+      t_tick_off: t('shop.tick_off'),
+      t_cat_breakfast: t('shop.cat_breakfast'),
+      t_cat_fish: t('shop.cat_fish'),
+      t_cat_poultry: t('shop.cat_poultry'),
+      t_cat_vegan_proteins: t('shop.cat_vegan_proteins'),
+      t_cat_eggs: t('shop.cat_eggs'),
+      t_cat_carbs: t('shop.cat_carbs'),
+      t_cat_veg: t('shop.cat_veg'),
+      t_cat_fruit: t('shop.cat_fruit'),
+      t_cat_pantry: t('shop.cat_pantry'),
+      t_export_list: t('shop.export_list'),
+      t_planner_impact: t('shop.planner_impact'),
+      t_meal_categories_covered: t('shop.meal_categories_covered'),
+      t_missing_heading: t('shop.missing_heading'),
+      t_missing_oats: t('shop.missing_oats'),
+      t_missing_milk: t('shop.missing_milk'),
+      t_missing_bread: t('shop.missing_bread'),
+      t_missing_yoghurt: t('shop.missing_yoghurt'),
+      t_missing_eggs: t('shop.missing_eggs'),
+      t_missing_rice: t('shop.missing_rice'),
+      t_missing_pasta: t('shop.missing_pasta'),
+      t_missing_potato: t('shop.missing_potato'),
+      t_missing_veg: t('shop.missing_veg'),
+      t_required_for_targets: t('shop.required_for_targets'),
+      t_nav_home: t('nav.home'),
+      t_nav_shop: t('nav.shop'),
+      t_nav_plan: t('nav.plan'),
+      t_nav_exercises: t('nav.exercises'),
+      t_nav_profile: t('nav.profile'),
+    };
+    // --- Open Food Facts search / add-item flow (results & added items live outside the 9 static categories) ---
+    const runSearch = () => {
+      const q = (this.state.searchQuery || '').trim();
+      if (!q) return;
+      this.setState({ searchLoading: true, searchError: null, searchResults: [] });
+      if (!window.KindFareOpenFoodFacts) { this.setState({ searchLoading: false, searchError: 'Search unavailable in this preview build.' }); return; }
+      window.KindFareOpenFoodFacts.searchProducts(q).then((results) => {
+        this.setState({ searchLoading: false, searchResults: results.slice(0, 3), searchError: results.length ? null : 'No matches found.' });
+      }).catch(() => {
+        this.setState({ searchLoading: false, searchError: 'Could not reach Open Food Facts. Try again.' });
+      });
+    };
+    const runBarcodeLookup = () => {
+      const code = (this.state.searchBarcode || '').trim();
+      if (!code) return;
+      this.setState({ searchLoading: true, searchError: null, searchResults: [] });
+      if (!window.KindFareOpenFoodFacts) { this.setState({ searchLoading: false, searchError: 'Lookup unavailable in this preview build.' }); return; }
+      window.KindFareOpenFoodFacts.lookupBarcode(code).then((result) => {
+        this.setState({ searchLoading: false, searchResults: result ? [result] : [], searchError: result ? null : 'No product found for that barcode.' });
+      }).catch(() => {
+        this.setState({ searchLoading: false, searchError: 'Could not reach Open Food Facts. Check the barcode and try again.' });
+      });
+    };
+    const MAX_ADDED_ITEMS = 5; // matches the 5 rendered ai1-ai5 slots below — must stay in sync
+    const addResult = (item) => {
+      this.setState((s) => {
+        const current = s.addedItems || [];
+        if (current.length >= MAX_ADDED_ITEMS) return {}; // safety net — the Add button already hides once full
+        if (window.KindFareSound) window.KindFareSound.success();
+        return {
+          addedItems: [...current, {
+            id: item.id, name: item.name, brand: item.brand,
+            kcal: item.per100g ? item.per100g.kcal : null,
+            source: item.source, reviewStatus: item.reviewStatus, sourceUrl: item.sourceUrl, checked: false,
+          }],
+          // only drop the item just added — keep the other results visible so a second
+          // result from the same search can still be added without re-searching
+          searchResults: (s.searchResults || []).filter((r) => r.id !== item.id),
+        };
+      });
+    };
+    const toggleAddedItem = (id) => { if (window.KindFareSound) window.KindFareSound.success(); this.setState((s) => ({ addedItems: s.addedItems.map((it) => it.id === id ? { ...it, checked: !it.checked } : it) })); };
+    const approveAddedItem = (id) => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState((s) => ({ addedItems: s.addedItems.map((it) => it.id === id ? { ...it, reviewStatus: 'verified' } : it) })); };
+    const rejectAddedItem = (id) => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState((s) => ({ addedItems: s.addedItems.filter((it) => it.id !== id) })); };
+
+    const sr = this.state.searchResults || [];
+    const atCap = (this.state.addedItems || []).length >= MAX_ADDED_ITEMS;
+    const resultVals = {};
+    for (let i = 0; i < 3; i++) {
+      const n = i + 1;
+      const item = sr[i];
+      resultVals['r' + n + 'Show'] = !!item;
+      resultVals['r' + n + 'Name'] = item ? item.name : '';
+      resultVals['r' + n + 'Brand'] = item && item.brand ? item.brand : 'Unknown brand';
+      resultVals['r' + n + 'Kcal'] = item && item.per100g && item.per100g.kcal != null ? item.per100g.kcal : '—';
+      resultVals['r' + n + 'Add'] = item ? () => addResult(item) : () => {};
+      resultVals['r' + n + 'AddLabel'] = atCap ? 'Full' : 'Add';
+      resultVals['r' + n + 'AddBg'] = atCap ? 'rgba(107,96,80,.3)' : '#4F7A63';
+    }
+
+    const ai = this.state.addedItems || [];
+    const addedVals = {};
+    for (let i = 0; i < 5; i++) {
+      const n = i + 1;
+      const it = ai[i];
+      const on = it ? !!it.checked : false;
+      addedVals['ai' + n + 'Show'] = !!it;
+      addedVals['ai' + n + 'Name'] = it ? it.name : '';
+      addedVals['ai' + n + 'Sub'] = it ? ((it.brand || 'Unknown brand') + (it.kcal != null ? ' · ' + it.kcal + ' kcal/100g' : '')) : '';
+      addedVals['ai' + n + 'RowBg'] = on ? 'rgba(79,122,99,.10)' : 'transparent';
+      addedVals['ai' + n + 'CircleBg'] = on ? '#4F7A63' : 'transparent';
+      addedVals['ai' + n + 'CircleBorder'] = on ? 'none' : (d ? '1.5px solid rgba(255,255,255,.22)' : '1.5px solid rgba(30,28,24,.18)');
+      addedVals['ai' + n + 'CheckDisplay'] = on ? 'flex' : 'none';
+      addedVals['ai' + n + 'Toggle'] = it ? () => toggleAddedItem(it.id) : () => {};
+      addedVals['ai' + n + 'PendingReview'] = it ? it.reviewStatus === 'pending_review' : false;
+      addedVals['ai' + n + 'Pill'] = it && it.reviewStatus === 'pending_review' ? 'inline-block' : 'none';
+      addedVals['ai' + n + 'Approve'] = it ? () => approveAddedItem(it.id) : () => {};
+      addedVals['ai' + n + 'Reject'] = it ? () => rejectAddedItem(it.id) : () => {};
+    }
+    const searchMode = this.state.searchMode || 'name';
+
+    return {
+      ...i18nVals,
+      dark: d,
+      // --- Add item / Open Food Facts search ---
+      searchOpen: this.state.searchOpen,
+      toggleSearchPanel: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState((s) => ({ searchOpen: !s.searchOpen })); },
+      isSearchModeName: searchMode === 'name',
+      isSearchModeBarcode: searchMode === 'barcode',
+      setSearchModeName: () => this.setState({ searchMode: 'name', searchResults: [], searchError: null }),
+      setSearchModeBarcode: () => this.setState({ searchMode: 'barcode', searchResults: [], searchError: null }),
+      modeNameBg: searchMode === 'name' ? '#fff' : 'transparent',
+      modeBarcodeBg: searchMode === 'barcode' ? '#fff' : 'transparent',
+      searchQuery: this.state.searchQuery || '',
+      searchBarcode: this.state.searchBarcode || '',
+      onSearchQueryChange: (e) => this.setState({ searchQuery: e.target.value }),
+      onBarcodeChange: (e) => this.setState({ searchBarcode: e.target.value }),
+      onSearchKeyDown: (e) => { if (e.key === 'Enter') runSearch(); },
+      onBarcodeKeyDown: (e) => { if (e.key === 'Enter') runBarcodeLookup(); },
+      runSearch, runBarcodeLookup,
+      searchLoading: !!this.state.searchLoading,
+      searchHasError: !!this.state.searchError,
+      searchError: this.state.searchError || '',
+      ...resultVals,
+      hasAddedItems: ai.length > 0,
+      addedItemsCountLabel: ai.filter((it) => it.checked).length + ' / ' + Math.min(ai.length, MAX_ADDED_ITEMS),
+      ...addedVals,
+      toggleDark: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState(s => ({ dark: !s.dark })); },
+      selectAll: () => { if (window.KindFareSound) window.KindFareSound.success(); const next = {}; for (const id of this.allItemIds) next[id] = true; this.setState({ itemChecked: next }); },
+      clearAll: () => { if (window.KindFareSound) window.KindFareSound.tap(); const next = {}; for (const id of this.allItemIds) next[id] = false; this.setState({ itemChecked: next }); },
+      checkedCount, totalItemsLabel: totalItems,
+      progressPct: totalItems ? Math.round((checkedCount / totalItems) * 100) + '%' : '0%',
+      ...catVals,
+      ...itemVals,
+      // --- diet view (Standard / Vegan) ---
+      isVegan: V,
+      showMeatFish: !V,
+      dietBadgeLabel: V ? 'Vegan-friendly items shown' : 'Meat & fish items shown',
+      setDietStandard: () => setDiet('standard'),
+      setDietVegan: () => setDiet('vegan'),
+      dietStdBg: V ? segOff.bg : segOn.bg, dietStdColor: V ? segOff.color : segOn.color,
+      dietVeganBg: V ? segOn.bg : segOff.bg, dietVeganColor: V ? segOn.color : segOff.color,
+      // --- items that swap for vegan-safe alternatives ---
+      milkName: V ? 'Oatly Oat Drink 1L' : 'Arla Lactofree Semi-Skimmed Milk 1L',
+      milkOpt1: V ? 'Alpro Soya Milk 1L' : 'Oatly Oat Drink 1L',
+      milkOpt2: V ? 'Oat Drink Barista Edition 1L' : 'Alpro Soya Milk 1L',
+      yoghurtName: V ? 'Alpro Plain Soya Yoghurt 500g' : 'Arla Lactofree Natural Yoghurt 500g',
+      yoghurtOpt1: V ? 'Koko Dairy-Free Yoghurt 350g' : 'Alpro Plain Soya Yoghurt 500g',
+      yoghurtOpt2: V ? 'Oatly Oatgurt 400g' : 'Koko Dairy-Free Yoghurt 350g',
+      honeyName: V ? 'Golden Syrup 340g' : 'Clear Honey 340g',
+      honeyOpt1: V ? 'Agave Nectar 330g' : 'Manuka Honey 250g',
+      honeyOpt2: V ? 'Date Syrup 300g' : 'Golden Syrup 340g',
+      eggsName: V ? 'Orgran No Egg Replacer 200g' : 'Free Range Eggs x6',
+      eggsOpt1: V ? "Crackd The Vegan Egg 240ml" : 'Free Range Eggs x12',
+      eggsOpt2: V ? 'Aquafaba (Chickpea Water) 400g' : 'Organic Eggs x6',
+      outerBg: d
+        ? 'radial-gradient(at 15% 8%,#211f2a 0,transparent 55%),radial-gradient(at 85% 5%,#201e1a 0,transparent 50%),radial-gradient(at 90% 85%,#1a1f22 0,transparent 55%),radial-gradient(at 10% 90%,#211f2a 0,transparent 50%),#1E1C18'
+        : 'radial-gradient(at 15% 8%,#F1F1EA 0,transparent 55%),radial-gradient(at 85% 5%,#EFEFE7 0,transparent 50%),radial-gradient(at 90% 85%,#EEF0E9 0,transparent 55%),radial-gradient(at 10% 90%,#F5F2EA 0,transparent 50%),#F5F2EA',
+      textPrimary: d ? '#F5F2EA' : '#1E1C18',
+      textSecondary: d ? '#b3a899' : '#6B6050',
+      hairline: d ? 'rgba(255,255,255,.12)' : 'rgba(30,28,24,.08)',
+      hairlineSoft: d ? 'rgba(255,255,255,.08)' : 'rgba(30,28,24,.06)',
+      hairlineStrong: d ? 'rgba(255,255,255,.22)' : 'rgba(30,28,24,.18)',
+      glassBg: d ? 'rgba(255,255,255,.08)' : 'rgba(255,255,255,.72)',
+      glassBgStrong: d ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.85)',
+      glassBgLight: d ? 'rgba(255,255,255,.06)' : 'rgba(255,255,255,.6)',
+      glassBgFaint: d ? 'rgba(255,255,255,.04)' : 'rgba(255,255,255,.4)',
+    };
+  }
+}
+</script>
+</body>
+</html>

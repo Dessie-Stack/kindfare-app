@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./kindfare-sound.js"></script>
+<script src="./kindfare-i18n.js"></script>
+<style>
+  body{margin:0}
+  [style*="overflow-y:auto"]::-webkit-scrollbar{display:none}
+  [style*="overflow-y:auto"]{scrollbar-width:none}
+  @keyframes kf-drift1{0%{transform:translate(0,0) scale(1)} 33%{transform:translate(55px,70px) scale(1.25)} 66%{transform:translate(-30px,40px) scale(0.88)} 100%{transform:translate(0,0) scale(1)}}
+  @keyframes kf-drift2{0%{transform:translate(0,0) scale(1)} 33%{transform:translate(-65px,45px) scale(1.2)} 66%{transform:translate(35px,-25px) scale(0.85)} 100%{transform:translate(0,0) scale(1)}}
+  @keyframes kf-drift3{0%{transform:translate(0,0) scale(1)} 33%{transform:translate(45px,-60px) scale(1.28)} 66%{transform:translate(-40px,25px) scale(0.82)} 100%{transform:translate(0,0) scale(1)}}
+  @media (prefers-reduced-motion: reduce){ [style*="kf-drift"]{animation:none !important} }
+
+  :focus-visible{outline:2px solid #4A6B8A;outline-offset:2px;border-radius:4px}
+  @keyframes kf-globe-spin{from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
+</style>
+</helmet>
+
+<div style="width:390px;height:844px;position:relative;background:{{ outerBg }};overflow:hidden;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:{{ textPrimary }};box-shadow:0 30px 70px rgba(0,0,0,.25)">
+
+  <div style="position:absolute;inset:0;z-index:0;overflow:hidden">
+    <div style="position:absolute;width:260px;height:260px;top:-60px;left:-70px;border-radius:50%;filter:blur(50px);opacity:{{ blobOpacity }};background:radial-gradient(circle,#e8ecf0 0%,#BDC9D6 70%,transparent 100%);animation:kf-drift1 11s ease-in-out infinite"></div>
+    <div style="position:absolute;width:300px;height:300px;top:160px;right:-110px;border-radius:50%;filter:blur(50px);opacity:{{ blobOpacity }};background:radial-gradient(circle,#dde6d5 0%,#7fa06b 70%,transparent 100%);animation:kf-drift2 13s ease-in-out infinite"></div>
+    <div style="position:absolute;width:280px;height:280px;bottom:180px;left:-90px;border-radius:50%;filter:blur(50px);opacity:{{ blobOpacity }};background:radial-gradient(circle,#f0c674 0%,#d98816 70%,transparent 100%);animation:kf-drift3 10s ease-in-out infinite"></div>
+    <div style="position:absolute;width:220px;height:220px;bottom:-80px;right:-40px;border-radius:50%;filter:blur(50px);opacity:{{ blobOpacity }};background:radial-gradient(circle,#d7dde3 0%,#BDC9D6 70%,transparent 100%);animation:kf-drift1 9s ease-in-out infinite reverse"></div>
+  </div>
+
+  <div style="position:relative;z-index:1;height:47px;padding:0 26px;display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:8px;font-size:15px;font-weight:600;color:{{ textPrimary }}">
+    <span>9:41</span>
+    <span style="display:flex;gap:5px;align-items:center">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/><rect x="5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/><rect x="10" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="1" fill="currentColor" opacity=".4"/></svg>
+      <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="1" y="1" width="21" height="11" rx="3" stroke="currentColor" stroke-width="1"/><rect x="2.5" y="2.5" width="15" height="8" rx="1.5" fill="currentColor"/><rect x="23.5" y="4" width="1.6" height="5" rx="0.8" fill="currentColor"/></svg>
+    </span>
+  </div>
+
+  <div style="position:relative;z-index:1;padding:10px 22px 0;display:flex;align-items:center;justify-content:space-between">
+    <a href="KindFare Home Redesign.dc.html" aria-label="{{ t_back }}" style="width:34px;height:34px;border-radius:50%;background:{{ glassBg }};border:1px solid {{ hairline }};backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:pointer;color:{{ textPrimary }};text-decoration:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="position:relative">
+        <button aria-label="{{ t_language_aria }}" onClick="{{ toggleLangPicker }}" style="width:32px;height:32px;border-radius:50%;background:{{ glassBg }};border:1px solid {{ hairline }};display:flex;align-items:center;justify-content:center;cursor:pointer;color:{{ textPrimary }}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M3 12h18" stroke="currentColor" stroke-width="1.7"/><path d="M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9s1.4-6.4 3.8-9z" stroke="currentColor" stroke-width="1.7"/></svg>
+        </button>
+      </div>
+      <button aria-label="{{ t_toggle_dark_mode }}" onClick="{{ toggleDark }}" style="width:32px;height:32px;border-radius:50%;background:{{ glassBg }};border:1px solid {{ hairline }};display:flex;align-items:center;justify-content:center;cursor:pointer;color:{{ textPrimary }}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div style="position:absolute;z-index:1;inset:91px 0 24px 0;overflow-y:auto;box-sizing:border-box;padding-bottom:24px">
+
+    <div style="padding:14px 20px 0">
+      <h1 style="font-size:27px;font-weight:700;letter-spacing:-.5px;font-family:ui-serif,Georgia,serif">{{ t_notifications }}</h1>
+      <div style="font-size:14px;line-height:1.5;color:{{ textSecondary }};font-weight:500;margin-top:4px">{{ t_subtitle }}</div>
+    </div>
+
+    <div style="margin:16px 20px 0;border-radius:22px;background:{{ glassBg }};backdrop-filter:blur(20px) saturate(160%);border:1px solid {{ hairline }};box-shadow:0 14px 28px rgba(30,28,24,.1);overflow:hidden">
+
+      <div style="display:flex;gap:12px;padding:16px 18px;border-bottom:1px solid {{ hairlineSoft }};background:{{ unreadBg }}">
+        <span style="flex-shrink:0;width:36px;height:36px;border-radius:11px;background:#BDC9D6;display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#1E1C18" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px"><span style="font-size:14.5px;font-weight:700">{{ t_n1_title }}</span><span style="width:7px;height:7px;border-radius:50%;background:#4A6B8A;flex-shrink:0"></span></div>
+          <div style="font-size:13px;line-height:1.45;color:{{ textSecondary }};font-weight:500;margin-top:2px">{{ t_n1_text }}</div>
+          <div style="font-size:11.5px;color:{{ textSecondary }};font-weight:600;margin-top:6px">{{ t_n1_time }}</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;padding:16px 18px;border-bottom:1px solid {{ hairlineSoft }};background:{{ unreadBg }}">
+        <span style="flex-shrink:0;width:36px;height:36px;border-radius:11px;background:#10b981;display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 2l1.9 5.9H20l-5 3.6L16.9 17 12 13.4 7.1 17 9 11.5 4 7.9h6.1L12 2z" fill="#fff"/></svg></span>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px"><span style="font-size:14.5px;font-weight:700">{{ t_n2_title }}</span><span style="width:7px;height:7px;border-radius:50%;background:#4A6B8A;flex-shrink:0"></span></div>
+          <div style="font-size:13px;line-height:1.45;color:{{ textSecondary }};font-weight:500;margin-top:2px">{{ t_n2_text }}</div>
+          <div style="font-size:11.5px;color:{{ textSecondary }};font-weight:600;margin-top:6px">{{ t_n2_time }}</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;padding:16px 18px;border-bottom:1px solid {{ hairlineSoft }};background:{{ unreadBg }}">
+        <!-- Mia's own AI-glow gradient (matches her FAB/chat avatar identity everywhere else), not a generic brand gradient -->
+        <span style="flex-shrink:0;width:36px;height:36px;border-radius:11px;background:conic-gradient(from 0deg, #3d7bff, #ff3d63, #ff9d2e, #31d97a, #3d7bff);display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z" fill="#fff"/></svg></span>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px"><span style="font-size:14.5px;font-weight:700">{{ t_n3_title }}</span><span style="width:7px;height:7px;border-radius:50%;background:#4A6B8A;flex-shrink:0"></span></div>
+          <div style="font-size:13px;line-height:1.45;color:{{ textSecondary }};font-weight:500;margin-top:2px">{{ t_n3_text }}</div>
+          <div style="font-size:11.5px;color:{{ textSecondary }};font-weight:600;margin-top:6px">{{ t_n3_time }}</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;padding:16px 18px;border-bottom:1px solid {{ hairlineSoft }}">
+        <span style="flex-shrink:0;width:36px;height:36px;border-radius:11px;background:#d98816;display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#fff" stroke-width="1.8"/><path d="M12 8v4l3 2" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <div style="flex:1;min-width:0">
+          <span style="font-size:14.5px;font-weight:700">{{ t_n4_title }}</span>
+          <div style="font-size:13px;line-height:1.45;color:{{ textSecondary }};font-weight:500;margin-top:2px">{{ t_n4_text }}</div>
+          <div style="font-size:11.5px;color:{{ textSecondary }};font-weight:600;margin-top:6px">{{ t_n4_time }}</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;padding:16px 18px;border-bottom:1px solid {{ hairlineSoft }}">
+        <span style="flex-shrink:0;width:36px;height:36px;border-radius:11px;background:#7c93b0;display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 3s6 6.8 6 11a6 6 0 01-12 0c0-4.2 6-11 6-11z" fill="#fff"/></svg></span>
+        <div style="flex:1;min-width:0">
+          <span style="font-size:14.5px;font-weight:700">{{ t_n5_title }}</span>
+          <div style="font-size:13px;line-height:1.45;color:{{ textSecondary }};font-weight:500;margin-top:2px">{{ t_n5_text }}</div>
+          <div style="font-size:11.5px;color:{{ textSecondary }};font-weight:600;margin-top:6px">{{ t_n5_time }}</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;padding:16px 18px">
+        <span style="flex-shrink:0;width:36px;height:36px;border-radius:11px;background:#7fa06b;display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M6 8h12l-1.2 10.2a2 2 0 01-2 1.8H9.2a2 2 0 01-2-1.8L6 8z" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <div style="flex:1;min-width:0">
+          <span style="font-size:14.5px;font-weight:700">{{ t_n6_title }}</span>
+          <div style="font-size:13px;line-height:1.45;color:{{ textSecondary }};font-weight:500;margin-top:2px">{{ t_n6_text }}</div>
+          <div style="font-size:11.5px;color:{{ textSecondary }};font-weight:600;margin-top:6px">{{ t_n6_time }}</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="padding:16px 20px 0;font-size:12px;line-height:1.5;color:{{ textSecondary }};font-weight:500;text-align:center">{{ t_all_caught_up }}</div>
+
+  </div>
+
+
+    <sc-if value="{{ langPickerOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;z-index:100;background:{{ outerBg }}">
+        <div style="position:absolute;inset:0;z-index:1;overflow-y:auto;box-sizing:border-box;padding:54px 20px 40px">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px">
+            <button aria-label="Back" onClick="{{ toggleLangPicker }}" style="width:36px;height:36px;border-radius:50%;background:{{ glassBg }};border:1px solid {{ hairline }};display:flex;align-items:center;justify-content:center;cursor:pointer;color:{{ textPrimary }};flex-shrink:0">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <h1 style="font-size:22px;font-weight:700;letter-spacing:-.3px;font-family:ui-serif,Georgia,serif;margin:0;color:{{ textPrimary }}">{{ t_choose_language }}</h1>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <button onClick="{{ setLangEn }}" style="width:100%;text-align:left;padding:17px 18px;border-radius:16px;border:1px solid {{ hairline }};background:{{ langEnBg }};color:{{ textPrimary }};font-size:15.5px;font-weight:600;cursor:pointer">English</button>
+            <button onClick="{{ setLangPt }}" style="width:100%;text-align:left;padding:17px 18px;border-radius:16px;border:1px solid {{ hairline }};background:{{ langPtBg }};color:{{ textPrimary }};font-size:15.5px;font-weight:600;cursor:pointer">Português</button>
+            <button onClick="{{ setLangHi }}" style="width:100%;text-align:left;padding:17px 18px;border-radius:16px;border:1px solid {{ hairline }};background:{{ langHiBg }};color:{{ textPrimary }};font-size:15.5px;font-weight:600;cursor:pointer;font-family:'Noto Sans Devanagari','Inter',sans-serif">हिन्दी</button>
+            <button onClick="{{ setLangEs }}" style="width:100%;text-align:left;padding:17px 18px;border-radius:16px;border:1px solid {{ hairline }};background:{{ langEsBg }};color:{{ textPrimary }};font-size:15.5px;font-weight:600;cursor:pointer">Español</button>
+            <button onClick="{{ setLangFr }}" style="width:100%;text-align:left;padding:17px 18px;border-radius:16px;border:1px solid {{ hairline }};background:{{ langFrBg }};color:{{ textPrimary }};font-size:15.5px;font-weight:600;cursor:pointer">Français</button>
+            <button onClick="{{ setLangUr }}" style="width:100%;text-align:left;padding:17px 18px;border-radius:16px;border:1px solid {{ hairline }};background:{{ langUrBg }};color:{{ textPrimary }};font-size:15.5px;font-weight:600;cursor:pointer;font-family:'Noto Nastaliq Urdu','Inter',sans-serif">اردو</button>
+          </div>
+
+          <button onClick="{{ confirmLangPicker }}" style="width:100%;margin-top:18px;padding:16px;border-radius:16px;border:none;background:#4A6B8A;color:#fff;font-size:15.5px;font-weight:700;cursor:pointer;box-shadow:0 10px 22px rgba(74,107,138,.28)">{{ t_done }}</button>
+
+          <!-- rotating globe — decorative, animation only, purely on the language picker page -->
+          <div style="display:flex;justify-content:center;margin-top:32px;perspective:600px">
+            <div style="width:46px;height:46px;animation:kf-globe-spin 5s linear infinite;transform-style:preserve-3d">
+              <svg width="46" height="46" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="#4A6B8A" stroke-width="1.4"/>
+                <ellipse cx="12" cy="12" rx="3.6" ry="9" stroke="#4A6B8A" stroke-width="1.2"/>
+                <ellipse cx="12" cy="12" rx="7.2" ry="9" stroke="#4A6B8A" stroke-width="1.2"/>
+                <path d="M3 12h18" stroke="#4A6B8A" stroke-width="1.2"/>
+                <path d="M4.5 7.5h15" stroke="#4A6B8A" stroke-width="1"/>
+                <path d="M4.5 16.5h15" stroke="#4A6B8A" stroke-width="1"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { dark: false, lang: (window.KindFareI18n ? KindFareI18n.getLang() : 'en'), langPickerOpen: false, pendingLang: null };
+  componentDidMount() {
+    // opening Notifications marks alerts read — Home's bell badge checks this same key
+    // and hides its red dot once it's set, matching how kf_name persists across screens.
+    try { localStorage.setItem('kf_notifs_read', 'true'); } catch (e) {}
+  }
+  renderVals() {
+    const d = this.state.dark;
+    const lang = this.state.lang;
+    const selLang = this.state.pendingLang ?? lang;
+    const t = (key) => window.KindFareI18n ? KindFareI18n.t(key, lang) : key;
+    const seg = (active) => active ? { bg: 'rgba(74,107,138,.14)' } : { bg: 'transparent' };
+    return {
+      dark: d,
+      toggleDark: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState(s => ({ dark: !s.dark })); },
+      lang,
+      langPickerOpen: this.state.langPickerOpen,
+      toggleLangPicker: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState(s => ({ langPickerOpen: !s.langPickerOpen, pendingLang: null })); },
+      setLangEn: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ pendingLang: 'en' }); },
+      setLangPt: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ pendingLang: 'pt' }); },
+      setLangHi: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ pendingLang: 'hi' }); },
+      setLangEs: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ pendingLang: 'es' }); },
+      setLangFr: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ pendingLang: 'fr' }); },
+      setLangUr: () => { if (window.KindFareSound) window.KindFareSound.tap(); this.setState({ pendingLang: 'ur' }); },
+      confirmLangPicker: () => { const nl = this.state.pendingLang || lang; if (window.KindFareI18n) KindFareI18n.setLang(nl); if (window.KindFareSound) window.KindFareSound.success(); this.setState({ lang: nl, langPickerOpen: false, pendingLang: null }); },
+      langEnBg: seg(selLang === 'en').bg,
+      langPtBg: seg(selLang === 'pt').bg,
+      langHiBg: seg(selLang === 'hi').bg,
+      langEsBg: seg(selLang === 'es').bg,
+      langFrBg: seg(selLang === 'fr').bg,
+      langUrBg: seg(selLang === 'ur').bg,
+      t_language_aria: t('common.language_aria'),
+      t_choose_language: t('common.choose_language'), t_done: t('common.done'),
+      t_toggle_dark_mode: t('common.toggle_dark_mode'),
+      t_back: t('common.back'),
+      t_notifications: t('common.notifications'),
+      t_subtitle: t('notif.subtitle'),
+      t_n1_title: t('notif.n1_title'), t_n1_text: t('notif.n1_text'), t_n1_time: t('notif.n1_time'),
+      t_n2_title: t('notif.n2_title'), t_n2_text: t('notif.n2_text'), t_n2_time: t('notif.n2_time'),
+      t_n3_title: t('notif.n3_title'), t_n3_text: t('notif.n3_text'), t_n3_time: t('notif.n3_time'),
+      t_n4_title: t('notif.n4_title'), t_n4_text: t('notif.n4_text'), t_n4_time: t('notif.n4_time'),
+      t_n5_title: t('notif.n5_title'), t_n5_text: t('notif.n5_text'), t_n5_time: t('notif.n5_time'),
+      t_n6_title: t('notif.n6_title'), t_n6_text: t('notif.n6_text'), t_n6_time: t('notif.n6_time'),
+      t_all_caught_up: t('notif.all_caught_up'),
+      // Matches the live app's .notif-row.unread treatment (rgba(189,201,214,.06)) — was previously
+      // stubbed to 'transparent' and only wired on the first row, so unread notifications never
+      // actually looked different from read ones beyond the small dot. Fixed during the Swift-merge audit.
+      unreadBg: 'rgba(189,201,214,.06)',
+      blobOpacity: d ? .35 : .85,
+      outerBg: d
+        ? 'radial-gradient(at 15% 8%,#211f2a 0,transparent 55%),radial-gradient(at 85% 5%,#201e1a 0,transparent 50%),radial-gradient(at 90% 85%,#1a1f22 0,transparent 55%),radial-gradient(at 10% 90%,#211f2a 0,transparent 50%),#1E1C18'
+        : 'radial-gradient(at 15% 8%,#F1F1EA 0,transparent 55%),radial-gradient(at 85% 5%,#EFEFE7 0,transparent 50%),radial-gradient(at 90% 85%,#EEF0E9 0,transparent 55%),radial-gradient(at 10% 90%,#F5F2EA 0,transparent 50%),#F5F2EA',
+      textPrimary: d ? '#F5F2EA' : '#1E1C18',
+      textSecondary: d ? '#b3a899' : '#6B6050',
+      hairline: d ? 'rgba(255,255,255,.12)' : 'rgba(30,28,24,.08)',
+      hairlineSoft: d ? 'rgba(255,255,255,.08)' : 'rgba(30,28,24,.06)',
+      glassBg: d ? 'rgba(255,255,255,.08)' : 'rgba(255,255,255,.72)',
+    };
+  }
+}
+</script>
+</body>
+</html>
